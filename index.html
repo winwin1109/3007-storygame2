@@ -24,21 +24,33 @@
             margin: 0; padding: 0; width: 100%; height: 100%;
             background-color: #222;
             display: flex; justify-content: center; align-items: center;
-            touch-action: none; /* 防止手機滑動 */
+            /* 預設禁止全畫面滑動，但允許內部容器捲動 */
+            touch-action: none; 
             overflow: hidden;
         }
 
-        /* 遊戲視窗固定比例，確保物理引擎穩定 */
+        /* 遊戲視窗：改為響應式填滿手機螢幕 */
         #game-window {
-            width: 1000px;
-            height: 650px;
+            width: 100vw;
+            height: 100vh;
+            max-width: 1200px;
+            max-height: 900px;
             background: linear-gradient(180deg, #5c94fc 0%, #a0c4ff 100%);
             position: relative;
-            border: 8px solid #000;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.8);
             overflow: hidden;
-            transform-origin: center center;
+            border: none;
+            border-radius: 0;
+        }
+
+        /* 在平板和電腦上恢復復古遊戲機邊框 */
+        @media (min-width: 768px) and (min-height: 600px) {
+            #game-window {
+                width: 95vw;
+                height: 90vh;
+                border: 8px solid #000;
+                border-radius: 20px;
+                box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+            }
         }
 
         /* UI 畫面層 */
@@ -49,49 +61,62 @@
             flex-direction: column;
             align-items: center;
             z-index: 100;
+            padding: 20px 10px;
+            overflow-y: auto;
+            touch-action: pan-y; /* 允許上下滑動 */
         }
         .screen.active { display: flex; }
 
-        /* 標題與按鈕 */
+        /* 標題與按鈕：使用 clamp 確保字體在手機不縮小 */
         h1.title {
-            font-size: 48px; color: #fff;
+            font-size: clamp(32px, 8vw, 48px); color: #fff;
             text-shadow: 4px 4px 0 #e74c3c, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
-            margin-top: 40px; letter-spacing: 2px; text-align: center;
+            margin-top: 5vh; letter-spacing: 2px; text-align: center;
+            padding: 0 10px;
         }
 
         .menu-btn {
             background: #e74c3c; color: white; border: 4px solid #fff;
-            padding: 15px 40px; font-size: 28px; border-radius: 15px;
-            cursor: pointer; box-shadow: 0 8px 0 #c0392b;
-            margin: 15px; transition: transform 0.1s;
-            width: 250px; text-align: center;
+            padding: clamp(10px, 3vw, 15px) 20px; 
+            font-size: clamp(20px, 5vw, 28px); 
+            border-radius: 15px;
+            cursor: pointer; box-shadow: 0 6px 0 #c0392b;
+            margin: 10px; transition: transform 0.1s;
+            width: 80%; max-width: 300px; text-align: center;
         }
-        .menu-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #c0392b; }
-        .menu-btn.blue { background: #3498db; box-shadow: 0 8px 0 #2980b9; }
+        .menu-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #c0392b; }
+        .menu-btn.blue { background: #3498db; box-shadow: 0 6px 0 #2980b9; }
         .menu-btn.blue:active { box-shadow: 0 0 0 #2980b9; }
-        .menu-btn.green { background: #2ecc71; box-shadow: 0 8px 0 #27ae60; }
+        .menu-btn.green { background: #2ecc71; box-shadow: 0 6px 0 #27ae60; }
         .menu-btn.green:active { box-shadow: 0 0 0 #27ae60; }
 
         .back-btn {
-            position: absolute; top: 20px; left: 20px;
+            position: absolute; top: 15px; left: 15px;
             background: #f1c40f; color: #333; border: 3px solid #000;
-            padding: 8px 20px; font-size: 20px; border-radius: 10px;
+            padding: clamp(6px, 2vw, 8px) clamp(10px, 3vw, 20px); 
+            font-size: clamp(16px, 4vw, 20px); 
+            border-radius: 10px;
             cursor: pointer; box-shadow: 3px 3px 0 #000;
             z-index: 1000;
         }
         .back-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #000; }
 
+        .mode-buttons {
+            display: flex; gap: 15px; margin-top: 5vh; flex-wrap: wrap; justify-content: center; width: 100%;
+        }
+
         /* 讀書信視圖 */
         .reader-container {
             background: var(--ui-bg); border: 4px solid #000; border-radius: 15px;
-            width: 80%; height: 70%; margin-top: 80px; padding: 30px;
+            width: 90%; max-width: 800px; height: 70vh; margin-top: 60px; padding: 20px;
             overflow-y: auto; text-align: left; box-shadow: 8px 8px 0 rgba(0,0,0,0.2);
-            font-size: 20px; line-height: 1.6; color: #333;
+            font-size: clamp(16px, 4vw, 22px); line-height: 1.6; color: #333;
+            touch-action: pan-y;
         }
 
         /* 閃卡視圖 */
         .flashcard-container {
-            width: 650px; height: 350px; margin-top: 80px;
+            width: 90%; max-width: 650px; height: 45vh; max-height: 350px; margin-top: 5vh;
             perspective: 1000px; cursor: pointer;
         }
         .flashcard {
@@ -103,24 +128,27 @@
             position: absolute; width: 100%; height: 100%;
             backface-visibility: hidden; display: flex;
             flex-direction: column; justify-content: center; align-items: center;
-            border: 6px solid #000; border-radius: 20px; padding: 30px;
-            text-align: center; font-size: 28px; line-height: 1.5;
-            box-shadow: 10px 10px 0 rgba(0,0,0,0.3);
+            border: 6px solid #000; border-radius: 20px; padding: 20px;
+            text-align: center; line-height: 1.4;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.3);
+            font-size: clamp(20px, 5vw, 28px);
         }
         .card-front { background: #f1c40f; color: #333; }
-        .card-back { background: #3498db; color: white; transform: rotateY(180deg); font-size: 24px;}
-        .card-controls { margin-top: 40px; display: flex; gap: 20px; align-items: center; }
+        .card-back { background: #3498db; color: white; transform: rotateY(180deg); font-size: clamp(18px, 4.5vw, 24px); }
+        .card-controls { margin-top: 30px; display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap; }
+        .card-btn { width: auto; min-width: 100px; padding: 10px 15px; font-size: clamp(16px, 4vw, 20px); margin: 0; }
         
         /* 遊戲視圖 (瑪利歐測驗) */
         #game-layer {
             position: absolute; inset: 0; display: none; overflow: hidden;
             background: linear-gradient(180deg, #5c94fc 0%, #a0c4ff 100%);
+            touch-action: none;
         }
         
         /* 記分板 */
         #score-display {
-            position: absolute; top: 20px; right: 20px; 
-            font-size: 28px; color: #fff; text-shadow: 2px 2px 0 #000; 
+            position: absolute; top: 15px; right: 15px; 
+            font-size: clamp(18px, 4vw, 28px); color: #fff; text-shadow: 2px 2px 0 #000; 
             z-index: 100; background: rgba(0,0,0,0.5);
             padding: 5px 15px; border-radius: 15px; border: 3px solid #000;
         }
@@ -135,35 +163,38 @@
 
         /* 瑪利歐風格立體雲朵題目 */
         .cloud-wrapper {
-            position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
-            width: 75%; z-index: 5;
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 800px; z-index: 5;
             filter: drop-shadow(3px 0 0 #000) drop-shadow(-3px 0 0 #000) 
                     drop-shadow(0 3px 0 #000) drop-shadow(0 -3px 0 #000) 
                     drop-shadow(6px 6px 0 rgba(0,0,0,0.3));
         }
         .cloud-body {
-            background: #fff; border-radius: 50px; padding: 25px 40px;
-            min-height: 80px; display: flex; align-items: center; justify-content: center;
-            position: relative; font-size: 22px; text-align: center;
+            background: #fff; border-radius: 50px; padding: clamp(10px, 3vw, 25px) clamp(15px, 4vw, 40px);
+            min-height: clamp(60px, 10vw, 80px); display: flex; align-items: center; justify-content: center;
+            position: relative; font-size: clamp(16px, 4vw, 22px); text-align: center;
         }
         .cloud-body::before, .cloud-body::after {
             content: ''; position: absolute; background: #fff; border-radius: 50%;
         }
-        .cloud-body::before { width: 100px; height: 100px; top: -35px; left: 15%; }
-        .cloud-body::after { width: 130px; height: 130px; top: -45px; right: 15%; }
+        .cloud-body::before { width: clamp(60px, 10vw, 100px); height: clamp(60px, 10vw, 100px); top: -20px; left: 10%; }
+        .cloud-body::after { width: clamp(80px, 15vw, 130px); height: clamp(80px, 15vw, 130px); top: -30px; right: 10%; }
         .cloud-text { position: relative; z-index: 2; line-height: 1.4; }
 
-        /* 磚頭選項 */
+        /* 磚頭選項 (錨點定在底部，保證跳躍能碰到) */
         .bricks-container {
-            position: absolute; top: 270px; width: 100%;
-            display: flex; justify-content: space-evenly; z-index: 5;
+            position: absolute; 
+            bottom: clamp(220px, 35vh, 280px); 
+            width: 100%;
+            display: flex; justify-content: center; gap: 2%; z-index: 5;
+            padding: 0 10px;
         }
         .brick {
-            background-color: #c84c0c; border: 4px solid #000; width: 220px; min-height: 60px;
+            background-color: #c84c0c; border: 3px solid #000; flex: 1; max-width: 220px; min-height: clamp(50px, 10vw, 60px);
             background-image: linear-gradient(to right, transparent 95%, #000 95%), linear-gradient(to bottom, transparent 95%, #000 95%);
             background-size: 20px 20px; display: flex; justify-content: center; align-items: center;
-            color: #fff; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 0 #000;
-            padding: 10px; text-align: center; position: relative; line-height: 1.3;
+            color: #fff; font-size: clamp(14px, 3.5vw, 20px); font-weight: bold; text-shadow: 2px 2px 0 #000;
+            padding: 5px; text-align: center; position: relative; line-height: 1.2;
         }
         .brick.hit { animation: bounce 0.2s ease; }
         @keyframes bounce { 0% { transform: translateY(0); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0); } }
@@ -171,71 +202,62 @@
         /* 遊戲角色 (小狗) */
         #mario {
             position: absolute; width: 60px; height: 80px;
-            bottom: 60px; left: 50%; transform: translateX(-50%);
+            bottom: 60px; left: 0; /* Base Left (計算得出) */
             font-size: 60px; line-height: 80px; text-align: center;
-            z-index: 20; transition: transform 0.1s;
+            z-index: 20; transform-origin: center;
         }
-        #mario.flip { transform: translateX(-50%) scaleX(-1); }
+        #mario.flip { transform: scaleX(-1); }
 
         /* 道具動畫 (蘑菇/毒花) */
         .item-popup {
-            position: absolute; font-size: 50px; opacity: 0; z-index: 4;
+            position: absolute; font-size: clamp(30px, 8vw, 50px); opacity: 0; z-index: 4;
             transition: all 0.5s ease-out; pointer-events: none;
         }
         .item-popup.show { opacity: 1; transform: translateY(-60px); }
 
         /* --- 虛擬手把控制區 --- */
         .controls-ui {
-            position: absolute; bottom: 10px; width: 100%; height: 150px;
+            position: absolute; bottom: 10px; width: 100%; height: 120px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; z-index: 100;
+            padding: 0 5vw; z-index: 100;
         }
         
-        /* 經典十字鍵設計 */
+        /* 經典十字鍵設計 (手機最適大小) */
         .d-pad-container {
-            width: 150px; height: 150px;
+            width: 120px; height: 120px;
             background: rgba(255,255,255,0.15);
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.3);
         }
-        .d-pad {
-            position: relative; width: 120px; height: 120px;
-        }
-        .d-center {
-            position: absolute; top: 40px; left: 40px; width: 40px; height: 40px;
-            background: #333; z-index: 1;
-        }
+        .d-pad { position: relative; width: 100px; height: 100px; }
+        .d-center { position: absolute; top: 33px; left: 33px; width: 34px; height: 34px; background: #333; z-index: 1; }
         .d-btn {
             position: absolute; background: #2a2a2a;
             display: flex; justify-content: center; align-items: center;
-            color: #555; font-size: 16px; font-weight: bold;
-            box-shadow: inset -2px -2px 0 #111, inset 2px 2px 0 #555;
-            z-index: 2;
+            color: #555; font-size: 14px; font-weight: bold;
+            box-shadow: inset -2px -2px 0 #111, inset 2px 2px 0 #555; z-index: 2;
         }
-        /* 只有左右鍵可按 */
-        .d-btn.active-btn { cursor: pointer; color: white; text-shadow: 1px 1px 0 #000; font-size: 22px; }
+        .d-btn.active-btn { cursor: pointer; color: white; text-shadow: 1px 1px 0 #000; font-size: 18px; }
         .d-btn.active-btn:active { background: #111; box-shadow: inset 2px 2px 0 #000; }
         
-        .d-up { top: 0; left: 40px; width: 40px; height: 40px; border-radius: 8px 8px 0 0; }
-        .d-down { bottom: 0; left: 40px; width: 40px; height: 40px; border-radius: 0 0 8px 8px; }
-        .d-left { top: 40px; left: 0; width: 40px; height: 40px; border-radius: 8px 0 0 8px; }
-        .d-right { top: 40px; right: 0; width: 40px; height: 40px; border-radius: 0 8px 8px 0; }
+        .d-up { top: 0; left: 33px; width: 34px; height: 34px; border-radius: 8px 8px 0 0; }
+        .d-down { bottom: 0; left: 33px; width: 34px; height: 34px; border-radius: 0 0 8px 8px; }
+        .d-left { top: 33px; left: 0; width: 34px; height: 34px; border-radius: 8px 0 0 8px; }
+        .d-right { top: 33px; right: 0; width: 34px; height: 34px; border-radius: 0 8px 8px 0; }
         
         /* 跳躍鍵 */
         .action-pad-container {
-            width: 130px; height: 130px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 50%;
+            width: 100px; height: 100px;
+            background: rgba(255,255,255,0.15); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.3);
         }
         .a-btn {
-            width: 80px; height: 80px; border-radius: 50%;
+            width: 70px; height: 70px; border-radius: 50%;
             background: #e74c3c; border: 4px solid #8e0000;
             box-shadow: inset -3px -3px 0 rgba(0,0,0,0.3), inset 3px 3px 0 rgba(255,255,255,0.4), 0 6px 0 #8e0000;
             cursor: pointer; user-select: none; color: white;
-            font-size: 32px; font-weight: bold; line-height: 72px; text-align: center;
+            font-size: 24px; font-weight: bold; line-height: 62px; text-align: center;
             transition: all 0.1s;
         }
         .a-btn:active { 
@@ -243,18 +265,21 @@
             box-shadow: inset -3px -3px 0 rgba(0,0,0,0.3), inset 3px 3px 0 rgba(255,255,255,0.4), 0 0 0 #8e0000; 
         }
 
-        /* 遊戲內訊息框 */
+        /* 遊戲內訊息框 (允許內部滑動) */
         #game-msg {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #fff; border: 6px solid #000; border-radius: 20px;
-            padding: 30px; text-align: center; z-index: 200; display: none;
-            box-shadow: 0 0 0 1000px rgba(0,0,0,0.6);
-            width: 70%; max-width: 600px;
+            background: #fff; border: 5px solid #000; border-radius: 20px;
+            padding: clamp(15px, 4vw, 30px); text-align: center; z-index: 200; display: none;
+            box-shadow: 0 0 0 2000px rgba(0,0,0,0.6);
+            width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; touch-action: pan-y;
         }
 
+        #msg-title { font-size: clamp(24px, 6vw, 36px); margin: 0 0 10px 0; }
+        #msg-reward { font-size: clamp(18px, 4vw, 24px); font-weight: bold; margin: 0; }
+        
         /* 回饋分析區塊 */
         #msg-analysis {
-            font-size: 20px; color: #333; text-align: left; 
+            font-size: clamp(14px, 3.5vw, 18px); color: #333; text-align: left; 
             background: #f0f4f8; padding: 15px; border-radius: 10px; 
             border: 3px solid #b6c6d3; margin-top: 15px; margin-bottom: 20px;
             line-height: 1.5; display: none;
@@ -268,8 +293,8 @@
     
     <!-- 主選單：選擇書信 -->
     <div id="screen-main" class="screen active">
-        <h1 class="title">聽故事學文書二: 禮儀文書挑戰賽</h1>
-        <p style="color:white; font-size:24px; text-shadow: 2px 2px #000;">請選擇你要探索的文書：</p>
+        <h1 class="title">聽故事學文書二:<br>禮儀文書挑戰賽</h1>
+        <p style="color:white; font-size:clamp(18px, 4vw, 24px); text-shadow: 2px 2px #000; text-align: center; margin-bottom: 10px;">請選擇你要探索的文書：</p>
         <button class="menu-btn" onclick="selectLetter('thanks')">💌 感謝信</button>
         <button class="menu-btn" onclick="selectLetter('invitation')">✉️ 邀請信</button>
         <button class="menu-btn" onclick="selectLetter('sympathy')">🩹 慰問信</button>
@@ -279,10 +304,10 @@
     <div id="screen-mode" class="screen">
         <button class="back-btn" onclick="showScreen('screen-main')">⬅️ 返回</button>
         <h1 class="title" id="mode-title">書信名稱</h1>
-        <div style="display: flex; gap: 20px; margin-top: 50px;">
-            <button class="menu-btn blue" onclick="startMode('read')">📖 讀書信</button>
-            <button class="menu-btn green" onclick="startMode('cards')">🃏 看卡片</button>
-            <button class="menu-btn" onclick="startMode('quiz')">🎮 去挑戰</button>
+        <div class="mode-buttons">
+            <button class="menu-btn blue card-btn" style="width:auto;" onclick="startMode('read')">📖 讀書信</button>
+            <button class="menu-btn green card-btn" style="width:auto;" onclick="startMode('cards')">🃏 看卡片</button>
+            <button class="menu-btn card-btn" style="width:auto;" onclick="startMode('quiz')">🎮 去挑戰</button>
         </div>
     </div>
 
@@ -295,7 +320,7 @@
     <!-- 模式 2：看卡片 -->
     <div id="screen-cards" class="screen">
         <button class="back-btn" onclick="showScreen('screen-mode')">⬅️ 返回</button>
-        <div style="color:white; font-size:24px; margin-top:20px; text-shadow:2px 2px #000;">點擊卡片翻面背誦</div>
+        <div style="color:white; font-size:clamp(18px, 4vw, 24px); margin-top:5vh; text-shadow:2px 2px #000;">點擊卡片翻面背誦</div>
         <div class="flashcard-container" onclick="flipCard()">
             <div class="flashcard" id="flashcard">
                 <div class="card-face card-front" id="card-front">正面問題</div>
@@ -303,9 +328,9 @@
             </div>
         </div>
         <div class="card-controls">
-            <button class="menu-btn blue" style="width:150px; font-size:20px;" onclick="prevCard()">上一張</button>
-            <span id="card-counter" style="color:white; font-size:24px; text-shadow:2px 2px #000;">1 / 5</span>
-            <button class="menu-btn blue" style="width:150px; font-size:20px;" onclick="nextCard()">下一張</button>
+            <button class="menu-btn blue card-btn" onclick="prevCard()">上一張</button>
+            <span id="card-counter" style="color:white; font-size:clamp(18px, 4.5vw, 24px); text-shadow:2px 2px #000;">1 / 5</span>
+            <button class="menu-btn blue card-btn" onclick="nextCard()">下一張</button>
         </div>
     </div>
 
@@ -349,27 +374,23 @@
 
         <!-- 遊戲訊息 -->
         <div id="game-msg">
-            <h2 id="msg-title" style="font-size:36px; margin:0 0 10px 0;"></h2>
-            <p id="msg-reward" style="font-size:24px; font-weight:bold; margin: 0;"></p>
+            <h2 id="msg-title"></h2>
+            <p id="msg-reward"></p>
             <div id="msg-analysis"></div>
-            <button class="menu-btn blue" style="width:180px; padding:10px; font-size:24px;" onclick="nextQuizQuestion()">繼續</button>
+            <button class="menu-btn blue card-btn" style="margin-top:15px;" onclick="nextQuizQuestion()">繼續</button>
         </div>
     </div>
 
 </div>
 
 <script>
-    // --- 音效系統 (純 JS 8-bit 模擬音效) ---
+    // --- 音效系統 ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
 
     function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new AudioContext();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
     function playSound(type) {
@@ -383,69 +404,42 @@
         const now = audioCtx.currentTime;
 
         if (type === 'click') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(600, now);
-            osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
-            gainNode.gain.setValueAtTime(0.05, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-            osc.start(now);
-            osc.stop(now + 0.1);
+            osc.type = 'square'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+            gainNode.gain.setValueAtTime(0.05, now); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
         } else if (type === 'jump') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(150, now);
-            osc.frequency.linearRampToValueAtTime(300, now + 0.2);
-            gainNode.gain.setValueAtTime(0.05, now);
-            gainNode.gain.linearRampToValueAtTime(0.01, now + 0.2);
-            osc.start(now);
-            osc.stop(now + 0.2);
+            osc.type = 'square'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(300, now + 0.2);
+            gainNode.gain.setValueAtTime(0.05, now); gainNode.gain.linearRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
         } else if (type === 'hit') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(150, now);
-            osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
-            gainNode.gain.setValueAtTime(0.2, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-            osc.start(now);
-            osc.stop(now + 0.1);
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
+            gainNode.gain.setValueAtTime(0.2, now); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
         } else if (type === 'correct') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(987.77, now); // B5音
-            osc.frequency.setValueAtTime(1318.51, now + 0.1); // E6音
-            gainNode.gain.setValueAtTime(0.1, now);
-            gainNode.gain.setValueAtTime(0.1, now + 0.1);
-            gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
-            osc.start(now);
-            osc.stop(now + 0.4);
+            osc.type = 'square'; osc.frequency.setValueAtTime(987.77, now); osc.frequency.setValueAtTime(1318.51, now + 0.1);
+            gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.setValueAtTime(0.1, now + 0.1); gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
+            osc.start(now); osc.stop(now + 0.4);
         } else if (type === 'wrong') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(200, now);
-            osc.frequency.linearRampToValueAtTime(100, now + 0.3);
-            gainNode.gain.setValueAtTime(0.1, now);
-            gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
-            osc.start(now);
-            osc.stop(now + 0.3);
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.linearRampToValueAtTime(100, now + 0.3);
+            gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
         } else if (type === 'win') {
             osc.type = 'square';
-            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-                osc.frequency.setValueAtTime(freq, now + i * 0.12);
-            });
-            gainNode.gain.setValueAtTime(0.1, now);
-            gainNode.gain.linearRampToValueAtTime(0, now + 0.6);
-            osc.start(now);
-            osc.stop(now + 0.6);
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => { osc.frequency.setValueAtTime(freq, now + i * 0.12); });
+            gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.linearRampToValueAtTime(0, now + 0.6);
+            osc.start(now); osc.stop(now + 0.6);
         }
     }
 
-    // 全局按鍵音效監聽
     document.addEventListener('pointerdown', (e) => {
-        initAudio(); // 確保使用者互動後解鎖瀏覽器音效限制
+        initAudio();
         if (e.target.closest('button') || e.target.closest('.flashcard-container')) {
-            // 跳躍鍵與十字鍵由專屬邏輯控制，不播放通用 click 聲
             if (e.target.closest('.a-btn') || e.target.closest('.d-btn')) return;
             playSound('click');
         }
     });
 
-    // --- 資料庫 (內容與題目) ---
+    // --- 資料庫 (內容保留不變) ---
     const db = {
         thanks: {
             title: "感謝信",
@@ -469,66 +463,12 @@
                 { q: "感謝信「下款」的排版與寫作特點？", a: "整體靠右對齊，包含發信機構、身分、姓名及「謹啟」，並使用中文大寫日期。" }
             ],
             quiz: [
-                { 
-                    q: "感謝信上款最適當的寫法是？", 
-                    opts: ["樂口福食品廠陳經理 台鑒", "給陳經理", "陳大文 收"], 
-                    ans: 0,
-                    rationales: [
-                        "正確！正式禮儀文書的上款必須包含完整的機構名稱、職銜及敬辭（台鑒）以示尊敬。",
-                        "錯誤。「給」字過於口語，且缺乏全名與正式敬辭，顯得不夠莊重。",
-                        "錯誤。「收」字通常用於信封上的郵寄地址欄，絕不適用於信件內文的開頭。"
-                    ]
-                },
-                { 
-                    q: "感謝信標題的排版與內容要求是？", 
-                    opts: ["靠左，寫上感謝信", "置中，扼要說明目的", "靠右，詳細解釋事由"], 
-                    ans: 1,
-                    rationales: [
-                        "錯誤。標題不應靠左排列，且「感謝信」三個字未具體說明感謝的事由。",
-                        "正確！標題的作用是讓收信人一眼看出主旨，必須置中並扼要說明目的。",
-                        "錯誤。標題排版不應靠右，且不需要在標題欄長篇大論解釋事由。"
-                    ]
-                },
-                { 
-                    q: "為了讓感謝信顯得真誠，正文第二段應該包含什麼？", 
-                    opts: ["重複活動的日期時間", "提出對廠商的批評建議", "具體說明活動的收穫"], 
-                    ans: 2,
-                    rationales: [
-                        "錯誤。第一段已交代過時間地點，重複已知資訊會讓信件顯得冗長空泛。",
-                        "錯誤。感謝信的核心是表達感激，加入批評會嚴重偏離主題並破壞雙方關係。",
-                        "正確！提出具體得著（如印證課堂所學）能證明你們的重視，讓收信人覺得付出有價值。"
-                    ]
-                },
-                { 
-                    q: "正文第三段（結尾段）的主要功能是？", 
-                    opts: ["重申謝意與期盼未來合作", "要求對方必須回信", "列出交通費的報銷清單"], 
-                    ans: 0,
-                    rationales: [
-                        "正確！在收結處再次感謝能加深印象，並釋出未來繼續保持良好關係的善意。",
-                        "錯誤。感謝信是單向傳達感激之情的文書，強制要求回覆顯得咄咄逼人。",
-                        "錯誤。行政或財務事宜必須透過其他專門文件處理，絕不可混入感謝信中。"
-                    ]
-                },
-                { 
-                    q: "在祝頌語中，「業務蒸蒸日上」應該如何排版？", 
-                    opts: ["與祝字放在同一行", "換行並頂格書寫", "換行並退兩格書寫"], 
-                    ans: 1,
-                    rationales: [
-                        "錯誤。不分行會破壞祝頌語的固定格式結構，顯得不夠正式。",
-                        "正確！傳統格式中，「祝」字前需空兩格，祝福的字句換行並「頂格」書寫，能顯示對收信人的最高敬意。",
-                        "錯誤。祝福語如果退格書寫，在傳統禮節上代表敬意不足。"
-                    ]
-                },
-                { 
-                    q: "感謝信下款的署名與日期排版要求是？", 
-                    opts: ["必須全部置中", "必須整體靠左對齊", "必須整體靠右對齊"], 
-                    ans: 2,
-                    rationales: [
-                        "錯誤。下款置中對齊不符合中文禮儀文書的規範。",
-                        "錯誤。整體靠左對齊通常是一般便條的寫法，缺乏正式文件的嚴肅感。",
-                        "正確！正式文書的下款署名及中文大寫日期，必須整體靠右對齊。"
-                    ]
-                }
+                { q: "感謝信上款最適當的寫法是？", opts: ["樂口福食品廠陳經理 台鑒", "給陳經理", "陳大文 收"], ans: 0, rationales: ["正確！正式禮儀文書的上款必須包含完整的機構名稱、職銜及敬辭（台鑒）以示尊敬。", "錯誤。「給」字過於口語，且缺乏全名與正式敬辭，顯得不夠莊重。", "錯誤。「收」字通常用於信封上的郵寄地址欄，絕不適用於信件內文的開頭。"] },
+                { q: "感謝信標題的排版與內容要求是？", opts: ["靠左，寫上感謝信", "置中，扼要說明目的", "靠右，詳細解釋事由"], ans: 1, rationales: ["錯誤。標題不應靠左排列，且「感謝信」三個字未具體說明感謝的事由。", "正確！標題的作用是讓收信人一眼看出主旨，必須置中並扼要說明目的。", "錯誤。標題排版不應靠右，且不需要在標題欄長篇大論解釋事由。"] },
+                { q: "為了讓感謝信顯得真誠，正文第二段應該包含什麼？", opts: ["重複活動的日期時間", "提出對廠商的批評建議", "具體說明活動的收穫"], ans: 2, rationales: ["錯誤。第一段已交代過時間地點，重複已知資訊會讓信件顯得冗長空泛。", "錯誤。感謝信的核心是表達感激，加入批評會嚴重偏離主題並破壞雙方關係。", "正確！提出具體得著（如印證課堂所學）能證明你們的重視，讓收信人覺得付出有價值。"] },
+                { q: "正文第三段（結尾段）的主要功能是？", opts: ["重申謝意與期盼未來合作", "要求對方必須回信", "列出交通費的報銷清單"], ans: 0, rationales: ["正確！在收結處再次感謝能加深印象，並釋出未來繼續保持良好關係的善意。", "錯誤。感謝信是單向傳達感激之情的文書，強制要求回覆顯得咄咄逼人。", "錯誤。行政或財務事宜必須透過其他專門文件處理，絕不可混入感謝信中。"] },
+                { q: "在祝頌語中，「業務蒸蒸日上」應該如何排版？", opts: ["與祝字放在同一行", "換行並頂格書寫", "換行並退兩格書寫"], ans: 1, rationales: ["錯誤。不分行會破壞祝頌語的固定格式結構，顯得不夠正式。", "正確！傳統格式中，「祝」字前需空兩格，祝福的字句換行並「頂格」書寫，能顯示對收信人的最高敬意。", "錯誤。祝福語如果退格書寫，在傳統禮節上代表敬意不足。"] },
+                { q: "感謝信下款的署名與日期排版要求是？", opts: ["必須全部置中", "必須整體靠左對齊", "必須整體靠右對齊"], ans: 2, rationales: ["錯誤。下款置中對齊不符合中文禮儀文書的規範。", "錯誤。整體靠左對齊通常是一般便條的寫法，缺乏正式文件的嚴肅感。", "正確！正式文書的下款署名及中文大寫日期，必須整體靠右對齊。"] }
             ]
         },
         invitation: {
@@ -552,66 +492,12 @@
                 { q: "傳統中文書信中的「挪抬」是甚麼意思？", a: "提到對方或其機構時（如「 貴院」、「 俯允」），前方空一格以示對收信人的尊敬。" }
             ],
             quiz: [
-                { 
-                    q: "寫給教育機構院長的上款，加上哪個敬辭最為恰當？", 
-                    opts: ["敬啟", "台鑒", "拜啟"], 
-                    ans: 1,
-                    rationales: [
-                        "錯誤。「敬啟」是發信人用於自己署名後的謙辭（恭敬地陳述），不可用於稱呼對方。",
-                        "正確！「台鑒」是用於請收信人（長輩或平輩）看信的標準尊稱敬辭。",
-                        "錯誤。「拜啟」多用於日文書信或極早期的古文，不適用於現代商業或禮儀文書。"
-                    ]
-                },
-                { 
-                    q: "邀請信正文第一段的核心重點是？", 
-                    opts: ["邀請的背景與正式提出邀請", "詳細的活動流程與時間表", "公司的歷史介紹"], 
-                    ans: 0,
-                    rationales: [
-                        "正確！第一段必須迅速建立語境，點明緣由並正式發出邀請。",
-                        "錯誤。活動的詳細時間、地點與內容，應該放在第二段（主體段落）中說明。",
-                        "錯誤。第一段應直入主題，過多與邀請無關的歷史介紹會讓信件失去焦點。"
-                    ]
-                },
-                { 
-                    q: "信中提到對方機構「__院」時，前面為何要空一格？", 
-                    opts: ["排版時不小心打錯", "為了湊字數", "挪抬，表示對收信人的尊敬"], 
-                    ans: 2,
-                    rationales: [
-                        "錯誤。這是傳統書信中有意為之的排版規則，並非錯字。",
-                        "錯誤。公文寫作講求精煉，不需要湊字數。",
-                        "正確！提及對方機構或行為時前方空一格（稱為「挪抬」），是傳統表達敬意的標準做法。"
-                    ]
-                },
-                { 
-                    q: "邀請信中請求對方答應的專用敬辭是？", 
-                    opts: ["拜託", "俯允", "惠覆"], 
-                    ans: 1,
-                    rationales: [
-                        "錯誤。「拜託」過於口語化，不適合用於正式的公函或邀請信。",
-                        "正確！「俯允」是謙卑地請求對方答應或允許的專用文言敬辭（如：如蒙 俯允）。",
-                        "錯誤。「惠覆」是請求對方「回信」的敬辭，而不是請求「答應」。"
-                    ]
-                },
-                { 
-                    q: "寫給教育界人士的文言祝頌語，排版正確的是？", 
-                    opts: ["全部置中排列", "順頌 教安 (放在同一行)", "順頌空兩格，教安頂格"], 
-                    ans: 2,
-                    rationales: [
-                        "錯誤。祝頌語有其固定的排列規則，不應整體置中。",
-                        "錯誤。將「順頌」與「教安」放同一行會破壞書信結構，無法展現對收信人的敬意。",
-                        "正確！「順頌」前須留空兩格，「教安」必須換行且頂格書寫，以示最高尊敬。"
-                    ]
-                },
-                { 
-                    q: "信件結尾「懇請於本年五月十五日前__」，空格應填入？", 
-                    opts: ["答覆", "惠覆", "回信"], 
-                    ans: 1,
-                    rationales: [
-                        "錯誤。「答覆」較為中性，缺乏對收信人的尊稱意味。",
-                        "正確！「惠覆」是請人回信時最標準、最有禮貌的敬辭。",
-                        "錯誤。「回信」太過口語，不符合邀請信應有的莊重感。"
-                    ]
-                }
+                { q: "寫給教育機構院長的上款，加上哪個敬辭最為恰當？", opts: ["敬啟", "台鑒", "拜啟"], ans: 1, rationales: ["錯誤。「敬啟」是發信人用於自己署名後的謙辭（恭敬地陳述），不可用於稱呼對方。", "正確！「台鑒」是用於請收信人（長輩或平輩）看信的標準尊稱敬辭。", "錯誤。「拜啟」多用於日文書信或極早期的古文，不適用於現代商業或禮儀文書。"] },
+                { q: "邀請信正文第一段的核心重點是？", opts: ["邀請的背景與正式提出邀請", "詳細的活動流程與時間表", "公司的歷史介紹"], ans: 0, rationales: ["正確！第一段必須迅速建立語境，點明緣由並正式發出邀請。", "錯誤。活動的詳細時間、地點與內容，應該放在第二段（主體段落）中說明。", "錯誤。第一段應直入主題，過多與邀請無關的歷史介紹會讓信件失去焦點。"] },
+                { q: "信中提到對方機構「__院」時，前面為何要空一格？", opts: ["排版時不小心打錯", "為了湊字數", "挪抬，表示對收信人的尊敬"], ans: 2, rationales: ["錯誤。這是傳統書信中有意為之的排版規則，並非錯字。", "錯誤。公文寫作講求精煉，不需要湊字數。", "正確！提及對方機構或行為時前方空一格（稱為「挪抬」），是傳統表達敬意的標準做法。"] },
+                { q: "邀請信中請求對方答應的專用敬辭是？", opts: ["拜託", "俯允", "惠覆"], ans: 1, rationales: ["錯誤。「拜託」過於口語化，不適合用於正式的公函或邀請信。", "正確！「俯允」是謙卑地請求對方答應或允許的專用文言敬辭（如：如蒙 俯允）。", "錯誤。「惠覆」是請求對方「回信」的敬辭，而不是請求「答應」。"] },
+                { q: "寫給教育界人士的文言祝頌語，排版正確的是？", opts: ["全部置中排列", "順頌 教安 (放在同一行)", "順頌空兩格，教安頂格"], ans: 2, rationales: ["錯誤。祝頌語有其固定的排列規則，不應整體置中。", "錯誤。將「順頌」與「教安」放同一行會破壞書信結構，無法展現對收信人的敬意。", "正確！「順頌」前須留空兩格，「教安」必須換行且頂格書寫，以示最高尊敬。"] },
+                { q: "信件結尾「懇請於本年五月十五日前__」，空格應填入？", opts: ["答覆", "惠覆", "回信"], ans: 1, rationales: ["錯誤。「答覆」較為中性，缺乏對收信人的尊稱意味。", "正確！「惠覆」是請人回信時最標準、最有禮貌的敬辭。", "錯誤。「回信」太過口語，不符合邀請信應有的莊重感。"] }
             ]
         },
         sympathy: {
@@ -634,66 +520,12 @@
                 { q: "慰問信的「祝頌語」與「下款」特點？", a: "常祝願「早日康復」；下款平輩之間使用「啟」或「上」即可，不需用太正式的「謹啟」。" }
             ],
             quiz: [
-                { 
-                    q: "同學之間的慰問信，上款稱呼最適合的是？", 
-                    opts: ["敬愛的陳小明：", "陳小明同學 台鑒", "陳小明同學："], 
-                    ans: 2,
-                    rationales: [
-                        "錯誤。「敬愛的」通常用於對長輩或師長，用在同學身上太過隆重且不自然。",
-                        "錯誤。平輩同學之間無需使用「台鑒」，否則會顯得太有距離感。",
-                        "正確！同學間直接稱呼姓名即可，既有禮貌又能展現親切與溫暖。"
-                    ]
-                },
-                { 
-                    q: "同學間的慰問信，關於「標題」的處理，下列何者最適當？", 
-                    opts: ["可以省略標題，以表達親切感", "必須詳細寫出受傷經過", "標題必須靠右對齊"], 
-                    ans: 0,
-                    rationales: [
-                        "正確！為了避免公事公辦的生硬感，平輩間的慰問信可完全省略標題，顯得更溫暖親切。",
-                        "錯誤。標題只要扼要點明事由（或直接省略）即可，不應在標題長篇大論。",
-                        "錯誤。如果決定要寫標題，格式上必須是「置中」排列，而非靠右。"
-                    ]
-                },
-                { 
-                    q: "正文第一段應該表達怎樣的語氣？", 
-                    opts: ["嚴厲指責他不小心", "擔心與真誠的慰問", "平淡無奇的陳述"], 
-                    ans: 1,
-                    rationales: [
-                        "錯誤。受傷的同學最需要的是安慰，指責會讓對方感到壓力與難過。",
-                        "正確！第一段應點出得知意外的擔心，並代表班級送上最真誠的關懷。",
-                        "錯誤。慰問信的核心在於「同理心」，平淡的陳述無法傳達溫暖的情感。"
-                    ]
-                },
-                { 
-                    q: "為了讓受傷同學安心，正文第二段通常會加入甚麼內容？", 
-                    opts: ["主動提出具體的課業協助", "要求他趕快出院", "抱怨他拖累了全班進度"], 
-                    ans: 0,
-                    rationales: [
-                        "正確！提供實質幫助（如代為整理筆記），能讓對方無後顧之憂地安心休養。",
-                        "錯誤。慰問信應勸慰對方聽從醫囑、安心靜養，不該給予出院壓力。",
-                        "錯誤。這充滿惡意，完全違背了慰問信關懷與支持的本意。"
-                    ]
-                },
-                { 
-                    q: "正文第三段提及「探訪計劃」的目的是甚麼？", 
-                    opts: ["去醫院玩樂", "表達隨時願意提供幫助與溫暖", "去檢查他是不是裝病"], 
-                    ans: 1,
-                    rationales: [
-                        "錯誤。醫院是需要安靜休養的地方，探訪絕不是為了玩樂。",
-                        "正確！提及探訪能傳達全體同學的支持，給予受傷同學精神上的鼓勵。",
-                        "錯誤。這缺乏對同學的基本信任，不該出現於表達善意的文書中。"
-                    ]
-                },
-                { 
-                    q: "平輩同學之間的署名，最適當的啟辭是？", 
-                    opts: ["謹啟", "啟", "敬啟"], 
-                    ans: 1,
-                    rationales: [
-                        "錯誤。「謹啟」代表非常恭敬地陳述，用於對長輩或上級，對平輩使用過於隆重。",
-                        "正確！平輩同學之間的署名，簡單用「啟」或「上」即可，既有禮貌又親切。",
-                        "錯誤。「敬啟」同樣帶有對長輩的恭敬意味，不適用於平輩。"
-                    ]
-                }
+                { q: "同學之間的慰問信，上款稱呼最適合的是？", opts: ["敬愛的陳小明：", "陳小明同學 台鑒", "陳小明同學："], ans: 2, rationales: ["錯誤。「敬愛的」通常用於對長輩或師長，用在同學身上太過隆重且不自然。", "錯誤。平輩同學之間無需使用「台鑒」，否則會顯得太有距離感。", "正確！同學間直接稱呼姓名即可，既有禮貌又能展現親切與溫暖。"] },
+                { q: "同學間的慰問信，關於「標題」的處理，下列何者最適當？", opts: ["可以省略標題，以表達親切感", "必須詳細寫出受傷經過", "標題必須靠右對齊"], ans: 0, rationales: ["正確！為了避免公事公辦的生硬感，平輩間的慰問信可完全省略標題，顯得更溫暖親切。", "錯誤。標題只要扼要點明事由（或直接省略）即可，不應在標題長篇大論。", "錯誤。如果決定要寫標題，格式上必須是「置中」排列，而非靠右。"] },
+                { q: "正文第一段應該表達怎樣的語氣？", opts: ["嚴厲指責他不小心", "擔心與真誠的慰問", "平淡無奇的陳述"], ans: 1, rationales: ["錯誤。受傷的同學最需要的是安慰，指責會讓對方感到壓力與難過。", "正確！第一段應點出得知意外的擔心，並代表班級送上最真誠的關懷。", "錯誤。慰問信的核心在於「同理心」，平淡的陳述無法傳達溫暖的情感。"] },
+                { q: "為了讓受傷同學安心，正文第二段通常會加入甚麼內容？", opts: ["主動提出具體的課業協助", "要求他趕快出院", "抱怨他拖累了全班進度"], ans: 0, rationales: ["正確！提供實質幫助（如代為整理筆記），能讓對方無後顧之憂地安心休養。", "錯誤。慰問信應勸慰對方聽從醫囑、安心靜養，不該給予出院壓力。", "錯誤。這充滿惡意，完全違背了慰問信關懷與支持的本意。"] },
+                { q: "正文第三段提及「探訪計劃」的目的是甚麼？", opts: ["去醫院玩樂", "表達隨時願意提供幫助與溫暖", "去檢查他是不是裝病"], ans: 1, rationales: ["錯誤。醫院是需要安靜休養的地方，探訪絕不是為了玩樂。", "正確！提及探訪能傳達全體同學的支持，給予受傷同學精神上的鼓勵。", "錯誤。這缺乏對同學的基本信任，不該出現於表達善意的文書中。"] },
+                { q: "平輩同學之間的署名，最適當的啟辭是？", opts: ["謹啟", "啟", "敬啟"], ans: 1, rationales: ["錯誤。「謹啟」代表非常恭敬地陳述，用於對長輩或上級，對平輩使用過於隆重。", "正確！平輩同學之間的署名，簡單用「啟」或「上」即可，既有禮貌又親切。", "錯誤。「敬啟」同樣帶有對長輩的恭敬意味，不適用於平輩。"] }
             ]
         }
     };
@@ -702,6 +534,14 @@
     let currentDataKey = '';
     let cardIndex = 0;
     
+    // --- 動態畫面尺寸變數 (取代原版縮放) ---
+    let gameWidth = window.innerWidth;
+    function updateGameDimensions() {
+        const gw = document.getElementById('game-window');
+        if (gw) gameWidth = gw.clientWidth;
+    }
+    window.addEventListener('resize', updateGameDimensions);
+
     // --- 介面切換 ---
     function showScreen(screenId) {
         document.querySelectorAll('.screen, #game-layer').forEach(el => {
@@ -713,6 +553,7 @@
             target.style.display = 'block';
         } else {
             target.classList.add('active');
+            target.scrollTo(0, 0); // 回到頂部
         }
     }
 
@@ -745,49 +586,37 @@
             document.getElementById('card-front').innerText = cards[cardIndex].q;
             document.getElementById('card-back').innerText = cards[cardIndex].a;
             document.getElementById('card-counter').innerText = `${cardIndex + 1} / ${cards.length}`;
-        }, 150); // 等待翻面動畫
+        }, 150);
     }
 
-    function flipCard() {
-        document.getElementById('flashcard').classList.toggle('is-flipped');
-    }
+    function flipCard() { document.getElementById('flashcard').classList.toggle('is-flipped'); }
+    function nextCard() { const cards = db[currentDataKey].cards; if(cardIndex < cards.length - 1) { cardIndex++; updateCardUI(); } }
+    function prevCard() { if(cardIndex > 0) { cardIndex--; updateCardUI(); } }
 
-    function nextCard() {
-        const cards = db[currentDataKey].cards;
-        if(cardIndex < cards.length - 1) { cardIndex++; updateCardUI(); }
-    }
-
-    function prevCard() {
-        if(cardIndex > 0) { cardIndex--; updateCardUI(); }
-    }
-
-    // --- 測驗遊戲引擎 (Mario 風格) ---
+    // --- 測驗遊戲引擎 ---
     let gameLoop;
     let quizIndex = 0;
-    let currentScore = 0; // 分數系統
+    let currentScore = 0;
     let isGameRunning = false;
     let hasAnswered = false;
 
     // 物理狀態
-    const mState = { x: 500, y: 0, vx: 0, vy: 0, width: 60, height: 80, isGrounded: true, speed: 6, jumpPower: -19, gravity: 0.8 };
-    // 按鍵狀態
+    const mState = { x: 0, y: 0, vx: 0, vy: 0, width: 60, height: 80, isGrounded: true, speed: 6, jumpPower: -19, gravity: 0.8 };
     const keys = { left: false, right: false, jump: false };
 
     function startMarioGame() {
         showScreen('game-layer');
         quizIndex = 0;
-        currentScore = 0; // 重置分數
+        currentScore = 0; 
         updateScoreDisplay();
+        updateGameDimensions(); // 確保讀取到正確視窗寬度
         loadQuizQuestion();
         
-        // 綁定虛擬按鈕事件
         bindControls();
-        // 綁定鍵盤事件
         window.addEventListener('keydown', handleKeyDown);
         window.addEventListener('keyup', handleKeyUp);
 
         isGameRunning = true;
-        lastTime = performance.now();
         requestAnimationFrame(physicsLoop);
     }
 
@@ -798,9 +627,7 @@
         showScreen('screen-mode');
     }
 
-    function updateScoreDisplay() {
-        document.getElementById('current-score').innerText = currentScore;
-    }
+    function updateScoreDisplay() { document.getElementById('current-score').innerText = currentScore; }
 
     function loadQuizQuestion() {
         hasAnswered = false;
@@ -810,7 +637,6 @@
         const container = document.getElementById('bricks-container');
         container.innerHTML = '';
         
-        // 生成磚頭
         qData.opts.forEach((opt, idx) => {
             let b = document.createElement('div');
             b.className = 'brick';
@@ -818,24 +644,21 @@
             b.dataset.index = idx;
             b.dataset.correct = (idx === qData.ans);
             
-            // 隱藏的道具 (蘑菇/毒花)
             let item = document.createElement('div');
             item.className = 'item-popup';
             item.innerText = (idx === qData.ans) ? '🍄' : '🌺';
             b.appendChild(item);
-
             container.appendChild(b);
         });
 
-        // 重置角色位置
-        mState.x = 470; 
+        // 根據視窗置中主角
+        mState.x = (gameWidth / 2) - (mState.width / 2); 
         mState.y = 0;
         mState.vx = 0;
         mState.vy = 0;
         updateMarioDOM();
     }
 
-    // --- 控制綁定 ---
     function bindControls() {
         const btnL = document.getElementById('btn-left');
         const btnR = document.getElementById('btn-right');
@@ -862,37 +685,29 @@
     }
 
     // --- 物理引擎 ---
-    let lastTime = 0;
     function physicsLoop(timestamp) {
         if(!isGameRunning) return;
         requestAnimationFrame(physicsLoop);
 
-        // 左右移動與動畫切換 (小狗走路/站立)
         if (keys.left) { mState.vx = -mState.speed; document.getElementById('mario').classList.add('flip'); document.getElementById('mario').innerText = '🐕';}
         else if (keys.right) { mState.vx = mState.speed; document.getElementById('mario').classList.remove('flip'); document.getElementById('mario').innerText = '🐕';}
         else { mState.vx = 0; document.getElementById('mario').innerText = mState.isGrounded ? '🐶' : '🐩'; }
 
         mState.x += mState.vx;
         
-        // 邊界限制 (Game window width is 1000)
+        // 確保不超過視窗邊界
         if (mState.x < 0) mState.x = 0;
-        if (mState.x > 1000 - mState.width) mState.x = 1000 - mState.width;
+        if (mState.x > gameWidth - mState.width) mState.x = gameWidth - mState.width;
 
-        // 重力與跳躍
         mState.vy += mState.gravity;
         mState.y += mState.vy;
 
-        // 地面碰撞
         if (mState.y >= 0) {
-            mState.y = 0;
-            mState.vy = 0;
-            mState.isGrounded = true;
+            mState.y = 0; mState.vy = 0; mState.isGrounded = true;
         } else {
-            mState.isGrounded = false;
-            document.getElementById('mario').innerText = '🐩'; // 跳躍中圖示
+            mState.isGrounded = false; document.getElementById('mario').innerText = '🐩';
         }
 
-        // 頂磚頭碰撞偵測 (只在上升時偵測)
         if (mState.vy < 0 && !hasAnswered) {
             checkBrickCollision();
         }
@@ -906,20 +721,19 @@
         m.style.bottom = (60 + Math.abs(mState.y)) + 'px'; // 地板高度 60
     }
 
+    // 碰撞偵測 (使用 getBoundingClientRect 適用於響應式佈局)
     function checkBrickCollision() {
         const marioRect = document.getElementById('mario').getBoundingClientRect();
         const bricks = document.querySelectorAll('.brick');
         
         bricks.forEach(brick => {
             const brickRect = brick.getBoundingClientRect();
-            // AABB 碰撞偵測 (小狗頭部碰到磚塊底部)
             if (marioRect.top <= brickRect.bottom && 
                 marioRect.top >= brickRect.top &&
                 marioRect.right > brickRect.left + 10 && 
                 marioRect.left < brickRect.right - 10) 
             {
-                // 發生碰撞，反彈往下
-                mState.vy = 2; 
+                mState.vy = 2; // 發生碰撞，反彈往下
                 triggerAnswer(brick);
             }
         });
@@ -928,29 +742,25 @@
     function triggerAnswer(brickEl) {
         if(hasAnswered) return;
         hasAnswered = true;
-        keys.left = false; keys.right = false; // 鎖定操作
+        keys.left = false; keys.right = false;
 
         playSound('hit');
-        
         brickEl.classList.add('hit');
+        
         const idx = parseInt(brickEl.dataset.index);
         const qData = db[currentDataKey].quiz[quizIndex];
         const isCorrect = (idx === qData.ans);
-        const rationale = qData.rationales[idx]; // 取得解析
+        const rationale = qData.rationales[idx];
         
         const popup = brickEl.querySelector('.item-popup');
         popup.classList.add('show');
 
         setTimeout(() => {
             if (isCorrect) {
-                playSound('correct');
-                currentScore += 2; 
-                updateScoreDisplay();
+                playSound('correct'); currentScore += 2; updateScoreDisplay();
                 showGameMsg("✅ 答對喇！", "獲得變大蘑菇！⭐ 分數 +2", rationale, "#27ae60");
             } else {
-                playSound('wrong');
-                currentScore -= 1; 
-                updateScoreDisplay();
+                playSound('wrong'); currentScore -= 1; updateScoreDisplay();
                 showGameMsg("❌ 哎呀！", "頂錯磚頭，被毒花咬到了！💔 分數 -1", rationale, "#e74c3c");
             }
         }, 800);
@@ -959,7 +769,6 @@
     function showGameMsg(title, reward, analysis, color) {
         document.getElementById('msg-title').innerText = title;
         document.getElementById('msg-title').style.color = color;
-        
         document.getElementById('msg-reward').innerText = reward;
         document.getElementById('msg-reward').style.color = color;
         
@@ -968,16 +777,17 @@
             analysisEl.style.display = 'block';
             analysisEl.innerHTML = `<strong>💡 錯誤/選項分析：</strong><br>${analysis}`;
         } else {
-            analysisEl.style.display = 'none'; // 過關結算時隱藏解析區塊
+            analysisEl.style.display = 'none';
         }
         
-        document.getElementById('game-msg').style.display = 'block';
+        const msgBox = document.getElementById('game-msg');
+        msgBox.style.display = 'block';
+        msgBox.scrollTo(0,0); // 重置捲動條
     }
 
     function nextQuizQuestion() {
         document.getElementById('game-msg').style.display = 'none';
         
-        // 檢查是否答對 (根據剛剛被 hit 的磚頭)
         const hitBrick = document.querySelector('.brick.hit');
         if (hitBrick && hitBrick.dataset.correct === 'true') {
             quizIndex++;
@@ -987,38 +797,21 @@
             loadQuizQuestion();
         } else {
             playSound('win');
-            // 過關顯示總分，不傳入 analysis 參數
-            showGameMsg(
-                "🎉 挑戰成功！", 
-                `你已完全掌握這份禮儀文書！\n🍄 你的總分是：${currentScore} 分`, 
-                null, 
-                "#f1c40f"
-            );
+            showGameMsg("🎉 挑戰成功！", `你已完全掌握這份禮儀文書！\n🍄 你的總分是：${currentScore} 分`, null, "#f1c40f");
             
-            // 改變按鈕功能為返回選單
             const btn = document.querySelector('#game-msg button');
             btn.innerText = "完成";
             btn.onclick = () => {
                 document.getElementById('game-msg').style.display = 'none';
                 btn.innerText = "繼續";
-                btn.onclick = nextQuizQuestion; // 恢復預設
+                btn.onclick = nextQuizQuestion; 
                 exitGame();
             };
         }
     }
 
-    // 視窗縮放處理，確保遊戲畫面比例
-    function resizeGame() {
-        const wrapper = document.getElementById('game-window');
-        const scale = Math.min(window.innerWidth / 1000, window.innerHeight / 650);
-        if (scale < 1) {
-            wrapper.style.transform = `scale(${scale})`;
-        } else {
-            wrapper.style.transform = `scale(1)`;
-        }
-    }
-    window.addEventListener('resize', resizeGame);
-    resizeGame();
+    // 初始化視窗變數
+    updateGameDimensions();
 
 </script>
 </body>
