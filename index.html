@@ -2,7 +2,7 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>聽故事學文書二: 禮儀文書挑戰賽</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;700;900&display=swap');
@@ -21,18 +21,18 @@
         }
 
         body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
+            margin: 0; padding: 0; width: 100%; 
+            height: 100%; height: 100dvh; /* 支援動態視窗高度，避開手機瀏覽器網址列 */
             background-color: #222;
             display: flex; justify-content: center; align-items: center;
-            /* 預設禁止全畫面滑動，但允許內部容器捲動 */
-            touch-action: none; 
+            touch-action: none; /* 防止整體畫面滑動 */
             overflow: hidden;
         }
 
-        /* 遊戲視窗：改為響應式填滿手機螢幕 */
+        /* 遊戲視窗：響應式填滿螢幕 */
         #game-window {
             width: 100vw;
-            height: 100vh;
+            height: 100%; height: 100dvh;
             max-width: 1200px;
             max-height: 900px;
             background: linear-gradient(180deg, #5c94fc 0%, #a0c4ff 100%);
@@ -62,17 +62,36 @@
             align-items: center;
             z-index: 100;
             padding: 20px 10px;
-            overflow-y: auto;
-            touch-action: pan-y; /* 允許上下滑動 */
+            overflow-y: auto; /* 允許小螢幕內容過長時滑動 */
+            touch-action: pan-y;
         }
         .screen.active { display: flex; }
 
-        /* 標題與按鈕：使用 clamp 確保字體在手機不縮小 */
+        /* 頂部返回按鈕：加上 safe-area-inset 自動避開手機瀏海 */
+        .back-btn {
+            position: absolute; 
+            top: calc(15px + env(safe-area-inset-top, 0px)); 
+            left: calc(15px + env(safe-area-inset-left, 0px));
+            background: #f1c40f; color: #333; border: 3px solid #000;
+            padding: clamp(6px, 2vw, 8px) clamp(10px, 3vw, 20px); 
+            font-size: clamp(16px, 4vw, 20px); 
+            border-radius: 10px;
+            cursor: pointer; box-shadow: 3px 3px 0 #000;
+            z-index: 9999; /* 確保不被遮擋 */
+        }
+        .back-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #000; }
+
+        /* 標題與按鈕 */
         h1.title {
             font-size: clamp(32px, 8vw, 48px); color: #fff;
             text-shadow: 4px 4px 0 #e74c3c, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
-            margin-top: 5vh; letter-spacing: 2px; text-align: center;
+            margin-top: calc(70px + env(safe-area-inset-top, 0px)); /* 自動為按鈕留出空間 */
+            letter-spacing: 2px; text-align: center;
             padding: 0 10px;
+        }
+
+        #screen-main h1.title {
+            margin-top: calc(40px + env(safe-area-inset-top, 0px));
         }
 
         .menu-btn {
@@ -90,17 +109,6 @@
         .menu-btn.green { background: #2ecc71; box-shadow: 0 6px 0 #27ae60; }
         .menu-btn.green:active { box-shadow: 0 0 0 #27ae60; }
 
-        .back-btn {
-            position: absolute; top: 15px; left: 15px;
-            background: #f1c40f; color: #333; border: 3px solid #000;
-            padding: clamp(6px, 2vw, 8px) clamp(10px, 3vw, 20px); 
-            font-size: clamp(16px, 4vw, 20px); 
-            border-radius: 10px;
-            cursor: pointer; box-shadow: 3px 3px 0 #000;
-            z-index: 1000;
-        }
-        .back-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #000; }
-
         .mode-buttons {
             display: flex; gap: 15px; margin-top: 5vh; flex-wrap: wrap; justify-content: center; width: 100%;
         }
@@ -108,15 +116,23 @@
         /* 讀書信視圖 */
         .reader-container {
             background: var(--ui-bg); border: 4px solid #000; border-radius: 15px;
-            width: 90%; max-width: 800px; height: 70vh; margin-top: 60px; padding: 20px;
+            width: 90%; max-width: 800px; 
+            height: calc(100% - 130px - env(safe-area-inset-top, 0px)); 
+            margin-top: calc(70px + env(safe-area-inset-top, 0px)); 
+            padding: 20px;
             overflow-y: auto; text-align: left; box-shadow: 8px 8px 0 rgba(0,0,0,0.2);
             font-size: clamp(16px, 4vw, 22px); line-height: 1.6; color: #333;
             touch-action: pan-y;
         }
 
         /* 閃卡視圖 */
+        .card-instruction {
+            color: white; font-size: clamp(18px, 4vw, 24px); 
+            margin-top: calc(70px + env(safe-area-inset-top, 0px)); 
+            text-shadow: 2px 2px #000; margin-bottom: 2vh;
+        }
         .flashcard-container {
-            width: 90%; max-width: 650px; height: 45vh; max-height: 350px; margin-top: 5vh;
+            width: 90%; max-width: 650px; height: 45vh; max-height: 350px;
             perspective: 1000px; cursor: pointer;
         }
         .flashcard {
@@ -147,9 +163,11 @@
         
         /* 記分板 */
         #score-display {
-            position: absolute; top: 15px; right: 15px; 
+            position: absolute; 
+            top: calc(15px + env(safe-area-inset-top, 0px)); 
+            right: calc(15px + env(safe-area-inset-right, 0px)); 
             font-size: clamp(18px, 4vw, 28px); color: #fff; text-shadow: 2px 2px 0 #000; 
-            z-index: 100; background: rgba(0,0,0,0.5);
+            z-index: 9999; background: rgba(0,0,0,0.5);
             padding: 5px 15px; border-radius: 15px; border: 3px solid #000;
         }
 
@@ -163,7 +181,9 @@
 
         /* 瑪利歐風格立體雲朵題目 */
         .cloud-wrapper {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            position: absolute; 
+            top: calc(80px + env(safe-area-inset-top, 0px)); /* 雲朵往下移避開按鈕 */
+            left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 800px; z-index: 5;
             filter: drop-shadow(3px 0 0 #000) drop-shadow(-3px 0 0 #000) 
                     drop-shadow(0 3px 0 #000) drop-shadow(0 -3px 0 #000) 
@@ -184,7 +204,7 @@
         /* 磚頭選項 (錨點定在底部，保證跳躍能碰到) */
         .bricks-container {
             position: absolute; 
-            bottom: clamp(220px, 35vh, 280px); 
+            bottom: clamp(220px, 35dvh, 280px); 
             width: 100%;
             display: flex; justify-content: center; gap: 2%; z-index: 5;
             padding: 0 10px;
@@ -320,7 +340,7 @@
     <!-- 模式 2：看卡片 -->
     <div id="screen-cards" class="screen">
         <button class="back-btn" onclick="showScreen('screen-mode')">⬅️ 返回</button>
-        <div style="color:white; font-size:clamp(18px, 4vw, 24px); margin-top:5vh; text-shadow:2px 2px #000;">點擊卡片翻面背誦</div>
+        <div class="card-instruction">點擊卡片翻面背誦</div>
         <div class="flashcard-container" onclick="flipCard()">
             <div class="flashcard" id="flashcard">
                 <div class="card-face card-front" id="card-front">正面問題</div>
@@ -439,7 +459,7 @@
         }
     });
 
-    // --- 資料庫 (內容保留不變) ---
+    // --- 資料庫 ---
     const db = {
         thanks: {
             title: "感謝信",
@@ -534,7 +554,7 @@
     let currentDataKey = '';
     let cardIndex = 0;
     
-    // --- 動態畫面尺寸變數 (取代原版縮放) ---
+    // --- 動態畫面尺寸變數 ---
     let gameWidth = window.innerWidth;
     function updateGameDimensions() {
         const gw = document.getElementById('game-window');
@@ -609,7 +629,7 @@
         quizIndex = 0;
         currentScore = 0; 
         updateScoreDisplay();
-        updateGameDimensions(); // 確保讀取到正確視窗寬度
+        updateGameDimensions(); 
         loadQuizQuestion();
         
         bindControls();
@@ -721,7 +741,6 @@
         m.style.bottom = (60 + Math.abs(mState.y)) + 'px'; // 地板高度 60
     }
 
-    // 碰撞偵測 (使用 getBoundingClientRect 適用於響應式佈局)
     function checkBrickCollision() {
         const marioRect = document.getElementById('mario').getBoundingClientRect();
         const bricks = document.querySelectorAll('.brick');
