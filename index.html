@@ -2,1059 +2,784 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👾 聽故事學文書一: 禮儀文書初體驗 👾</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>聽故事學文書二: 禮儀文書挑戰賽</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;700;900&display=swap');
+
+        /* 統一所有元素的字體 */
+        * {
+            font-family: 'Noto Sans HK', 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+            box-sizing: border-box;
+        }
+
         :root {
-            --neon-green: #39ff14;
-            --neon-blue: #0ff;
-            --neon-pink: #f0f;
-            --neon-yellow: #ff0;
-            --bg-color: #050505;
+            --mario-blue: #5c94fc;
+            --mario-brick: #c84c0c;
+            --mario-ground: #00a800;
+            --ui-bg: rgba(255, 255, 255, 0.95);
         }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--neon-green);
-            font-family: 'Press Start 2P', 'Noto Sans TC', monospace;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            /* CRT 螢幕掃描線效果 */
-            background-image: linear-gradient(rgba(0, 255, 0, 0.03) 50%, rgba(0, 0, 0, 0.1) 50%);
-            background-size: 100% 4px;
-            user-select: none;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(0, 0, 0, 0.85);
-            border: 4px solid var(--neon-blue);
-            border-radius: 10px;
-            box-shadow: 0 0 15px var(--neon-blue), inset 0 0 20px rgba(0, 255, 255, 0.2);
-            padding: 30px 20px;
-            position: relative;
+        body, html {
+            margin: 0; padding: 0; width: 100%; 
+            height: 100%; height: 100dvh;
+            background-color: #222;
+            display: flex; justify-content: center; align-items: center;
+            touch-action: none;
             overflow: hidden;
         }
 
-        .screen { display: none; animation: fadeIn 0.4s ease-in; }
-        .screen.active { display: block; }
-
-        .score-board {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 1.2rem;
-            color: var(--neon-yellow);
-            text-shadow: 0 0 5px var(--neon-yellow);
-            z-index: 100;
+        /* 遊戲視窗 */
+        #game-window {
+            width: 100vw;
+            height: 100%; height: 100dvh;
+            max-width: 1200px;
+            max-height: 900px;
+            background: linear-gradient(180deg, #5c94fc 0%, #a0c4ff 100%);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            border-radius: 0;
         }
 
-        h1 { color: var(--neon-pink); font-size: 1.8rem; text-shadow: 0 0 10px var(--neon-pink); margin-bottom: 20px; line-height: 1.6; }
-        h2 { color: var(--neon-blue); font-size: 1.3rem; border-bottom: 2px dashed var(--neon-blue); display: inline-block; padding-bottom: 10px; text-shadow: 0 0 5px var(--neon-blue); margin-top: 0;}
-        p { line-height: 1.8; font-family: 'Noto Sans TC', sans-serif; font-size: 1.1rem; }
-
-        /* 復古按鈕 */
-        .btn {
-            background-color: transparent;
-            color: var(--neon-green);
-            border: 3px solid var(--neon-green);
-            padding: 12px 20px;
-            font-size: 1.1rem;
-            font-family: 'Press Start 2P', 'Noto Sans TC', monospace;
-            cursor: pointer;
-            margin: 10px 5px;
-            text-shadow: 0 0 5px var(--neon-green);
-            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
-            transition: 0.2s;
+        @media (min-width: 768px) and (min-height: 600px) {
+            #game-window {
+                width: 95vw; height: 90vh;
+                border: 8px solid #000;
+                border-radius: 20px;
+                box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+            }
         }
-        .btn:hover { background-color: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); }
-        .btn:active { transform: scale(0.95); }
-        .btn.secondary { border-color: var(--neon-pink); color: var(--neon-pink); text-shadow: 0 0 5px var(--neon-pink); box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); }
-        .btn.secondary:hover { background-color: var(--neon-pink); color: #000; box-shadow: 0 0 20px var(--neon-pink); }
-        .btn.warning { border-color: var(--neon-yellow); color: var(--neon-yellow); }
-        .btn.warning:hover { background-color: var(--neon-yellow); color: #000; }
 
-        /* ================= 第一關：填充題 ================= */
-        .level-text { font-family: 'Noto Sans TC', sans-serif; font-size: 1.2rem; line-height: 2.2; text-align: left; background: rgba(0,255,0,0.05); padding: 20px; border: 2px solid var(--neon-green); }
-        .blank { display: inline-block; min-width: 80px; height: 30px; border-bottom: 3px solid var(--neon-pink); margin: 0 8px; cursor: pointer; color: var(--neon-pink); font-weight: bold; text-align: center; vertical-align: bottom; background: rgba(255,0,255,0.1); }
-        .blank.selected { background-color: rgba(255,0,255,0.4); box-shadow: 0 0 10px var(--neon-pink); }
-        .word-bank { margin-top: 25px; padding: 15px; border: 2px dashed var(--neon-blue); }
-        .word-btn { background-color: transparent; color: var(--neon-blue); border: 2px solid var(--neon-blue); padding: 8px 12px; font-size: 1.1rem; margin: 5px; cursor: pointer; font-family: 'Noto Sans TC', sans-serif; font-weight: bold; }
-        .word-btn:hover { background-color: var(--neon-blue); color: #000; }
-
-        /* ================= 第二關：飛機射擊 ================= */
-        #shooter-container { width: 100%; height: 400px; background: #000; border: 3px solid var(--neon-pink); position: relative; overflow: hidden; margin: 10px 0; background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 50px 50px; }
-        #player-plane { position: absolute; bottom: 20px; left: 50%; width: 50px; height: 50px; font-size: 40px; transform: translateX(-50%); line-height: 50px; z-index: 10; }
-        .enemy { position: absolute; background: rgba(0, 255, 255, 0.1); border: 2px solid var(--neon-blue); color: var(--neon-blue); padding: 5px 10px; font-family: 'Noto Sans TC', sans-serif; font-weight: bold; font-size: 1rem; box-shadow: 0 0 8px var(--neon-blue); text-align: center; }
-        .bullet { position: absolute; width: 4px; height: 15px; background: var(--neon-yellow); box-shadow: 0 0 10px var(--neon-yellow); }
-
-        .shooter-controls { display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; width: 100%; }
-        .shooter-controls .action-btn { flex: 1; padding: 15px 5px; font-size: 1.2rem; white-space: nowrap; touch-action: none; user-select: none; }
-
-        /* ================= 第三關：坦克大戰 ================= */
-        .stage-target-banner { background: rgba(255, 255, 0, 0.15); border: 3px solid var(--neon-yellow); padding: 15px; margin: 15px 0; border-radius: 5px; box-shadow: 0 0 15px rgba(255, 255, 0, 0.4); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 15px rgba(255,255,0,0.4); } 50% { box-shadow: 0 0 25px rgba(255,255,0,0.8); } 100% { box-shadow: 0 0 15px rgba(255,255,0,0.4); } }
-        
-        .stage-target-text { font-size: 2.8rem; font-weight: 900; color: var(--neon-yellow); text-shadow: 0 0 15px var(--neon-yellow); letter-spacing: 5px; font-family: 'Noto Sans TC', sans-serif; margin-top: 10px; }
-
-        #tank-container { width: 100%; height: 450px; background: #111; border: 4px solid var(--neon-green); position: relative; overflow: hidden; margin: 10px 0; transition: background 0.5s; box-shadow: inset 0 0 20px #000; }
-        
-        .bg-stage1 { background-color: #1a1a1a; }
-        .bg-stage2 { background-color: #0f1a0f; }
-        .bg-stage3 { background-color: #0f0f1a; }
-        .bg-stage4 { background-color: #1a0f0f; }
-        .bg-stage5 { background-color: #1a1a0f; }
-
-        .wall-block { position: absolute; background-color: #b22222; background-image: linear-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px); background-size: 16px 16px; border: 2px solid #5a0000; box-shadow: 3px 3px 5px rgba(0,0,0,0.6); z-index: 2; }
-
-        #player-tank { position: absolute; width: 32px; height: 32px; background: #e6b800; border: 2px solid #fff; border-radius: 4px; z-index: 10; box-shadow: 0 0 10px var(--neon-yellow); transform: rotate(0deg); }
-        #player-tank::before { content: ''; position: absolute; top: -4px; left: -6px; right: -6px; bottom: -4px; border-left: 6px dashed #555; border-right: 6px dashed #555; z-index: -1; }
-        #player-tank::after { content: ''; position: absolute; top: -12px; left: 10px; width: 8px; height: 16px; background: #fff; border: 1px solid #999; }
-        
-        .doc-block { position: absolute; background: rgba(0,0,0,0.85); border: 2px dashed #fff; padding: 10px; font-family: 'Noto Sans TC', sans-serif; font-weight: bold; font-size: 0.9rem; text-align: center; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(255,255,255,0.5); z-index: 5; transition: transform 0.2s;}
-        .doc-block:hover { transform: scale(1.1); cursor: pointer; }
-        .doc-block.type-target { border-color: var(--neon-blue); color: var(--neon-blue); }
-        .doc-block.type-distractor { border-color: var(--neon-pink); color: var(--neon-pink); }
-        .doc-block.exploded { background: var(--neon-pink); color: #fff; transform: scale(1.5); opacity: 0; transition: 0.3s; }
-
-        /* ================= 共用控制與彈窗 ================= */
-        .controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 10px; flex-wrap: wrap; }
-        .d-pad { display: grid; grid-template-columns: 55px 55px 55px; grid-template-rows: 55px 55px; gap: 5px; touch-action: none; }
-        .d-btn { background: rgba(0,255,0,0.1); border: 2px solid var(--neon-green); color: var(--neon-green); font-size: 1.5rem; border-radius: 5px; cursor: pointer; box-shadow: inset 0 0 5px var(--neon-green); touch-action: none; user-select: none; }
-        .d-btn:active { background: var(--neon-green); color: #000; box-shadow: none; }
-        .d-up { grid-column: 2; grid-row: 1; }
-        .d-left { grid-column: 1; grid-row: 2; }
-        .d-down { grid-column: 2; grid-row: 2; }
-        .d-right { grid-column: 3; grid-row: 2; }
-
-        .action-btn { background: transparent; border: 2px solid #fff; color: #fff; padding: 15px 20px; font-size: 1.2rem; cursor: pointer; border-radius: 5px; font-family: 'Noto Sans TC', sans-serif; font-weight: bold; touch-action: none; user-select: none;}
-        .action-btn:active { background: #fff; color: #000; }
-
-        .game-modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.95); border: 4px solid var(--neon-yellow); padding: 25px; width: 85%; max-width: 450px; z-index: 100; display: none; box-shadow: 0 0 20px var(--neon-yellow); font-family: 'Noto Sans TC', sans-serif; }
-        .game-modal h3 { font-size: 1.5rem; margin-top: 0; }
-        .game-modal p { font-size: 1.1rem; line-height: 1.6; }
-
-        .feedback-msg { min-height: 25px; font-size: 1rem; font-weight: bold; margin: 10px 0; font-family: 'Noto Sans TC', sans-serif; }
-
-        @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
-        .blink { animation: blinker 1s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
-
-        @media (max-width: 480px) {
-            .shooter-controls .action-btn { font-size: 1rem; padding: 15px 2px; }
-            .stage-target-text { font-size: 2rem; }
+        /* UI 畫面層 */
+        .screen {
+            position: absolute; inset: 0; display: none;
+            flex-direction: column; align-items: center;
+            z-index: 100; padding: 20px 10px;
+            overflow-y: auto; touch-action: pan-y;
         }
+        .screen.active { display: flex; }
+
+        .back-btn {
+            position: absolute; 
+            top: calc(15px + env(safe-area-inset-top, 0px)); 
+            left: calc(15px + env(safe-area-inset-left, 0px));
+            background: #f1c40f; color: #333; border: 3px solid #000;
+            padding: clamp(6px, 2vw, 8px) clamp(10px, 3vw, 20px); 
+            font-size: clamp(16px, 4vw, 20px); 
+            border-radius: 10px;
+            cursor: pointer; box-shadow: 3px 3px 0 #000;
+            z-index: 9999;
+        }
+        .back-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #000; }
+
+        h1.title {
+            font-size: clamp(32px, 8vw, 48px); color: #fff;
+            text-shadow: 4px 4px 0 #e74c3c, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
+            margin-top: calc(70px + env(safe-area-inset-top, 0px));
+            letter-spacing: 2px; text-align: center; padding: 0 10px;
+        }
+
+        #screen-main h1.title { margin-top: calc(40px + env(safe-area-inset-top, 0px)); }
+
+        .menu-btn {
+            background: #e74c3c; color: white; border: 4px solid #fff;
+            padding: clamp(10px, 3vw, 15px) 20px; 
+            font-size: clamp(20px, 5vw, 28px); 
+            border-radius: 15px; cursor: pointer; box-shadow: 0 6px 0 #c0392b;
+            margin: 10px; transition: transform 0.1s;
+            width: 80%; max-width: 300px; text-align: center;
+        }
+        .menu-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #c0392b; }
+        .menu-btn.blue { background: #3498db; box-shadow: 0 6px 0 #2980b9; }
+        .menu-btn.blue:active { box-shadow: 0 0 0 #2980b9; }
+        .menu-btn.green { background: #2ecc71; box-shadow: 0 6px 0 #27ae60; }
+        .menu-btn.green:active { box-shadow: 0 0 0 #27ae60; }
+
+        .mode-buttons { display: flex; gap: 15px; margin-top: 5vh; flex-wrap: wrap; justify-content: center; width: 100%; }
+
+        /* 讀書信視圖 */
+        .reader-container {
+            background: var(--ui-bg); border: 4px solid #000; border-radius: 15px;
+            width: 90%; max-width: 800px; 
+            height: calc(100% - 130px - env(safe-area-inset-top, 0px)); 
+            margin-top: calc(70px + env(safe-area-inset-top, 0px)); 
+            padding: 20px; overflow-y: auto; text-align: left; box-shadow: 8px 8px 0 rgba(0,0,0,0.2);
+            font-size: clamp(16px, 4vw, 22px); line-height: 1.6; color: #333;
+            touch-action: pan-y; position: relative;
+        }
+
+        /* 💡 互動提示按鈕與側滑面板 */
+        .tip-btn {
+            display: inline-flex; justify-content: center; align-items: center;
+            background: #f39c12; color: white; border: 2px solid #000;
+            border-radius: 50%; width: clamp(26px, 6vw, 32px); height: clamp(26px, 6vw, 32px);
+            font-size: clamp(14px, 3.5vw, 18px); cursor: pointer;
+            box-shadow: 2px 2px 0 #000; margin-left: 8px; margin-right: 4px;
+            vertical-align: middle; flex-shrink: 0; padding: 0;
+            transition: transform 0.1s;
+        }
+        .tip-btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 #000; }
+
+        .tip-panel {
+            position: absolute; top: 0; right: -120%; /* 預設藏在畫面右外側 */
+            width: 85%; max-width: 350px; height: 100%;
+            background: rgba(253, 246, 227, 0.98); 
+            border-left: 6px solid #e74c3c; box-shadow: -10px 0 20px rgba(0,0,0,0.4);
+            transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 2000; 
+            padding: calc(20px + env(safe-area-inset-top, 0px)) 20px 20px 20px;
+            display: flex; flex-direction: column; overflow-y: auto; touch-action: pan-y;
+        }
+        .tip-panel.show { right: 0; }
+        .close-tip-btn {
+            align-self: flex-start; background: #333; color: white; border: 2px solid #000;
+            padding: 8px 15px; border-radius: 10px; font-size: 16px; cursor: pointer;
+            margin-bottom: 20px; box-shadow: 2px 2px 0 #000;
+        }
+        .close-tip-btn:active { transform: translate(2px,2px); box-shadow: 0 0 0 #000; }
+        .tip-panel h3 { color: #e74c3c; margin-top: 0; font-size: 24px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        .tip-panel p { font-size: 18px; line-height: 1.6; color: #333; font-weight: bold; }
+
+        /* 閃卡視圖 */
+        .card-instruction {
+            color: white; font-size: clamp(18px, 4vw, 24px); 
+            margin-top: calc(70px + env(safe-area-inset-top, 0px)); 
+            text-shadow: 2px 2px #000; margin-bottom: 2vh;
+        }
+        .flashcard-container { width: 90%; max-width: 650px; height: 45vh; max-height: 350px; perspective: 1000px; cursor: pointer; }
+        .flashcard { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.is-flipped { transform: rotateY(180deg); }
+        .card-face {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            border: 6px solid #000; border-radius: 20px; padding: 20px; text-align: center; line-height: 1.4;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.3); font-size: clamp(20px, 5vw, 28px);
+        }
+        .card-front { background: #f1c40f; color: #333; }
+        .card-back { background: #3498db; color: white; transform: rotateY(180deg); font-size: clamp(18px, 4.5vw, 24px); }
+        .card-controls { margin-top: 30px; display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap; }
+        .card-btn { width: auto; min-width: 100px; padding: 10px 15px; font-size: clamp(16px, 4vw, 20px); margin: 0; }
+        
+        /* 遊戲視圖 */
+        #game-layer { position: absolute; inset: 0; display: none; overflow: hidden; background: linear-gradient(180deg, #5c94fc 0%, #a0c4ff 100%); touch-action: none; }
+        #score-display { position: absolute; top: calc(15px + env(safe-area-inset-top, 0px)); right: calc(15px + env(safe-area-inset-right, 0px)); font-size: clamp(18px, 4vw, 28px); color: #fff; text-shadow: 2px 2px 0 #000; z-index: 9999; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 15px; border: 3px solid #000; }
+        .ground { position: absolute; bottom: 0; width: 100%; height: 60px; background-color: var(--mario-brick); background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); background-size: 20px 20px; background-position: 0 0, 10px 10px; border-top: 4px solid #000; z-index: 10; }
+        
+        .cloud-wrapper { position: absolute; top: calc(80px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); width: 90%; max-width: 800px; z-index: 5; filter: drop-shadow(3px 0 0 #000) drop-shadow(-3px 0 0 #000) drop-shadow(0 3px 0 #000) drop-shadow(0 -3px 0 #000) drop-shadow(6px 6px 0 rgba(0,0,0,0.3)); }
+        .cloud-body { background: #fff; border-radius: 50px; padding: clamp(10px, 3vw, 25px) clamp(15px, 4vw, 40px); min-height: clamp(60px, 10vw, 80px); display: flex; align-items: center; justify-content: center; position: relative; font-size: clamp(16px, 4vw, 22px); text-align: center; }
+        .cloud-body::before, .cloud-body::after { content: ''; position: absolute; background: #fff; border-radius: 50%; }
+        .cloud-body::before { width: clamp(60px, 10vw, 100px); height: clamp(60px, 10vw, 100px); top: -20px; left: 10%; }
+        .cloud-body::after { width: clamp(80px, 15vw, 130px); height: clamp(80px, 15vw, 130px); top: -30px; right: 10%; }
+        .cloud-text { position: relative; z-index: 2; line-height: 1.4; }
+
+        .bricks-container { position: absolute; bottom: clamp(220px, 35dvh, 280px); width: 100%; display: flex; justify-content: center; gap: 2%; z-index: 5; padding: 0 10px; }
+        .brick { background-color: #c84c0c; border: 3px solid #000; flex: 1; max-width: 220px; min-height: clamp(50px, 10vw, 60px); background-image: linear-gradient(to right, transparent 95%, #000 95%), linear-gradient(to bottom, transparent 95%, #000 95%); background-size: 20px 20px; display: flex; justify-content: center; align-items: center; color: #fff; font-size: clamp(14px, 3.5vw, 20px); font-weight: bold; text-shadow: 2px 2px 0 #000; padding: 5px; text-align: center; position: relative; line-height: 1.2; }
+        .brick.hit { animation: bounce 0.2s ease; }
+        @keyframes bounce { 0% { transform: translateY(0); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0); } }
+
+        #mario { position: absolute; width: 60px; height: 80px; bottom: 60px; left: 0; font-size: 60px; line-height: 80px; text-align: center; z-index: 20; transform-origin: center; }
+        #mario.flip { transform: scaleX(-1); }
+
+        .item-popup { position: absolute; font-size: clamp(30px, 8vw, 50px); opacity: 0; z-index: 4; transition: all 0.5s ease-out; pointer-events: none; }
+        .item-popup.show { opacity: 1; transform: translateY(-60px); }
+
+        /* 防縮放控制區 */
+        .controls-ui {
+            position: absolute; bottom: 10px; width: 100%; height: 120px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 5vw; z-index: 100;
+        }
+        .d-pad-container { width: 120px; height: 120px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.3); }
+        .d-pad { position: relative; width: 100px; height: 100px; }
+        .d-center { position: absolute; top: 33px; left: 33px; width: 34px; height: 34px; background: #333; z-index: 1; }
+        .d-btn, .a-btn {
+            /* 關鍵防縮放 CSS */
+            user-select: none; -webkit-user-select: none; touch-action: none;
+        }
+        .d-btn { position: absolute; background: #2a2a2a; display: flex; justify-content: center; align-items: center; color: #555; font-size: 14px; font-weight: bold; box-shadow: inset -2px -2px 0 #111, inset 2px 2px 0 #555; z-index: 2; }
+        .d-btn.active-btn { cursor: pointer; color: white; text-shadow: 1px 1px 0 #000; font-size: 18px; }
+        .d-btn.active-btn:active { background: #111; box-shadow: inset 2px 2px 0 #000; }
+        .d-up { top: 0; left: 33px; width: 34px; height: 34px; border-radius: 8px 8px 0 0; }
+        .d-down { bottom: 0; left: 33px; width: 34px; height: 34px; border-radius: 0 0 8px 8px; }
+        .d-left { top: 33px; left: 0; width: 34px; height: 34px; border-radius: 8px 0 0 8px; }
+        .d-right { top: 33px; right: 0; width: 34px; height: 34px; border-radius: 0 8px 8px 0; }
+        
+        .action-pad-container { width: 100px; height: 100px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.3); }
+        .a-btn { width: 70px; height: 70px; border-radius: 50%; background: #e74c3c; border: 4px solid #8e0000; box-shadow: inset -3px -3px 0 rgba(0,0,0,0.3), inset 3px 3px 0 rgba(255,255,255,0.4), 0 6px 0 #8e0000; cursor: pointer; color: white; font-size: 24px; font-weight: bold; line-height: 62px; text-align: center; transition: all 0.1s; }
+        .a-btn:active { transform: translateY(6px); box-shadow: inset -3px -3px 0 rgba(0,0,0,0.3), inset 3px 3px 0 rgba(255,255,255,0.4), 0 0 0 #8e0000; }
+
+        #game-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border: 5px solid #000; border-radius: 20px; padding: clamp(15px, 4vw, 30px); text-align: center; z-index: 200; display: none; box-shadow: 0 0 0 2000px rgba(0,0,0,0.6); width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; touch-action: pan-y; }
+        #msg-title { font-size: clamp(24px, 6vw, 36px); margin: 0 0 10px 0; }
+        #msg-reward { font-size: clamp(18px, 4vw, 24px); font-weight: bold; margin: 0; }
+        #msg-analysis { font-size: clamp(14px, 3.5vw, 18px); color: #333; text-align: left; background: #f0f4f8; padding: 15px; border-radius: 10px; border: 3px solid #b6c6d3; margin-top: 15px; margin-bottom: 20px; line-height: 1.5; display: none; }
+
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="score-board">SCORE: <span id="score">0</span></div>
-
-    <div id="screen-home" class="screen active">
-        <h1>👾 聽故事學文書一<br>禮儀文書初體驗 👾</h1>
-        <div style="font-size: 50px; margin: 20px 0; letter-spacing: 15px;">💌🤝🎉💐</div>
-        <div style="border: 2px dashed var(--neon-green); padding: 20px; text-align: left; margin-bottom: 25px;">
-            <h3 style="color: var(--neon-green); margin-top: 0; font-family: 'Noto Sans TC';">>> MISSION BRIEFING</h3>
-            <p style="color: #ccc;"><strong>禮儀文書</strong>是以禮儀為目的或在社交場合使用的文書。</p>
-            <p style="color: #ccc;">核心任務：透過表達對受文者的<strong>尊重</strong>，維繫友誼、增進感情，保持雙方良好的關係。</p>
-        </div>
-        <button class="btn blink" onclick="startGame()">INSERT COIN TO START</button>
+<div id="game-window">
+    
+    <!-- 主選單 -->
+    <div id="screen-main" class="screen active">
+        <h1 class="title">聽故事學文書二:<br>禮儀文書挑戰賽</h1>
+        <p style="color:white; font-size:clamp(18px, 4vw, 24px); text-shadow: 2px 2px #000; text-align: center; margin-bottom: 10px;">請選擇你要探索的文書：</p>
+        <button class="menu-btn" onclick="selectLetter('thanks')">💌 感謝信</button>
+        <button class="menu-btn" onclick="selectLetter('invitation')">✉️ 邀請信</button>
+        <button class="menu-btn" onclick="selectLetter('sympathy')">🩹 慰問信</button>
     </div>
 
-    <div id="screen-level1" class="screen">
-        <h2>>> STAGE 1: DATA RECOVERY</h2>
-        <p>系統資料受損，請點擊橫線並從詞彙庫中載入正確數據！</p>
-        
-        <div class="level-text">
-            1. 講究<span class="blank" data-id="0" onclick="selectBlank(0)"></span>，能給人親切、<span class="blank" data-id="1" onclick="selectBlank(1)"></span>、愉快的感覺。<br><br>
-            2. 有特定的<span class="blank" data-id="2" onclick="selectBlank(2)"></span>，語言簡潔、準確、<span class="blank" data-id="3" onclick="selectBlank(3)"></span>，感情真摯。<br><br>
-            3. 具有<span class="blank" data-id="4" onclick="selectBlank(4)"></span>作用，能達到密切聯繫、增進<span class="blank" data-id="5" onclick="selectBlank(5)"></span>的目的。
-        </div>
-
-        <div class="word-bank" id="l1-words"></div>
-        <div class="feedback-msg" id="l1-feedback"></div>
-        <button class="btn" onclick="checkLevel1()">EXECUTE_</button>
-    </div>
-
-    <div id="screen-level2" class="screen">
-        <h2>>> STAGE 2: AIR COMBAT</h2>
-        <p style="font-size: 0.9rem;">空襲警報！請駕駛戰機擊落真正的「禮儀文書」！<br><span style="color:var(--neon-pink);">注意：射錯非禮儀文書會扣分！漏掉目標將影響戰績！</span></p>
-        
-        <div id="shooter-container">
-            <div id="player-plane">✈️</div>
-        </div>
-
-        <div class="shooter-controls">
-            <button class="action-btn" onmousedown="sKeys.left=true; updateMoveDir()" onmouseup="sKeys.left=false; updateMoveDir()" onmouseleave="sKeys.left=false; updateMoveDir()" ontouchstart="sKeys.left=true; updateMoveDir()" ontouchend="sKeys.left=false; updateMoveDir()">⬅️ 左</button>
-            <button class="action-btn" style="border-color:var(--neon-pink); color:var(--neon-pink);" onclick="shootBullet()">🔴 射擊</button>
-            <button class="action-btn" onmousedown="sKeys.right=true; updateMoveDir()" onmouseup="sKeys.right=false; updateMoveDir()" onmouseleave="sKeys.right=false; updateMoveDir()" ontouchstart="sKeys.right=true; updateMoveDir()" ontouchend="sKeys.right=false; updateMoveDir()">右 ➡️</button>
-        </div>
-        
-        <div class="feedback-msg" id="l2-feedback" style="color: var(--neon-yellow);">等待指令... 目標：擊落 8 份禮儀文書</div>
-
-        <div id="shooter-modal" class="game-modal">
-            <h3 id="sm-title"></h3>
-            <p id="sm-desc"></p>
-            <button class="btn" onclick="resumeShooter()">CONTINUE_</button>
-        </div>
-
-        <div id="shooter-result-modal" class="game-modal" style="border-color: var(--neon-pink);">
-            <h3 style="color: var(--neon-pink);">>> BATTLE RESULT</h3>
-            <p id="sr-desc" style="color:#fff;"></p>
-            <button class="btn secondary" onclick="retryLevel2()">再次挑戰收復失地</button>
-            <button class="btn warning" onclick="proceedToLevel3()">帶著失敗戰績前行</button>
+    <!-- 子選單 -->
+    <div id="screen-mode" class="screen">
+        <button class="back-btn" onclick="showScreen('screen-main')">⬅️ 返回</button>
+        <h1 class="title" id="mode-title">書信名稱</h1>
+        <div class="mode-buttons">
+            <button class="menu-btn blue card-btn" style="width:auto;" onclick="startMode('read')">📖 讀書信</button>
+            <button class="menu-btn green card-btn" style="width:auto;" onclick="startMode('cards')">🃏 看卡片</button>
+            <button class="menu-btn card-btn" style="width:auto;" onclick="startMode('quiz')">🎮 去挑戰</button>
         </div>
     </div>
 
-    <div id="screen-level3" class="screen">
-        <h2>>> STAGE 3: RESCUE MISSION</h2>
-        
-        <div class="stage-target-banner">
-            <div style="font-size: 1.2rem; color: #ccc;">>> 總部指令：營救以下友軍 <<</div>
-            <div class="stage-target-text">【<span id="l3-stage-name"></span>】</div>
-        </div>
-        
-        <div id="tank-container" class="bg-stage1">
-            <div id="player-tank"></div>
-        </div>
+    <!-- 模式 1：讀書信 -->
+    <div id="screen-read" class="screen">
+        <button class="back-btn" onclick="showScreen('screen-mode')">⬅️ 返回</button>
+        <div class="reader-container" id="reader-content"></div>
 
-        <div class="controls">
-            <div class="d-pad">
-                <button class="d-btn d-up" onmousedown="tKeys.up=true; updateTankDir()" onmouseup="tKeys.up=false; updateTankDir()" onmouseleave="tKeys.up=false; updateTankDir()" ontouchstart="tKeys.up=true; updateTankDir()" ontouchend="tKeys.up=false; updateTankDir()">⬆️</button>
-                <button class="d-btn d-left" onmousedown="tKeys.left=true; updateTankDir()" onmouseup="tKeys.left=false; updateTankDir()" onmouseleave="tKeys.left=false; updateTankDir()" ontouchstart="tKeys.left=true; updateTankDir()" ontouchend="tKeys.left=false; updateTankDir()">⬅️</button>
-                <button class="d-btn d-down" onmousedown="tKeys.down=true; updateTankDir()" onmouseup="tKeys.down=false; updateTankDir()" onmouseleave="tKeys.down=false; updateTankDir()" ontouchstart="tKeys.down=true; updateTankDir()" ontouchend="tKeys.down=false; updateTankDir()">⬇️</button>
-                <button class="d-btn d-right" onmousedown="tKeys.right=true; updateTankDir()" onmouseup="tKeys.right=false; updateTankDir()" onmouseleave="tKeys.right=false; updateTankDir()" ontouchstart="tKeys.right=true; updateTankDir()" ontouchend="tKeys.right=false; updateTankDir()">➡️</button>
+        <!-- 💡 提示卡片側滑面板 -->
+        <div id="tip-panel" class="tip-panel">
+            <button class="close-tip-btn" onclick="hideTip()">✖ 隱藏重點</button>
+            <h3 id="tip-title">寫作重點</h3>
+            <!-- 這裡改為使用 innerHTML 來支援 HTML 排版 -->
+            <p id="tip-content">這裡顯示內容...</p>
+        </div>
+    </div>
+
+    <!-- 模式 2：看卡片 -->
+    <div id="screen-cards" class="screen">
+        <button class="back-btn" onclick="showScreen('screen-mode')">⬅️ 返回</button>
+        <div class="card-instruction">點擊卡片翻面背誦</div>
+        <div class="flashcard-container" onclick="flipCard()">
+            <div class="flashcard" id="flashcard">
+                <div class="card-face card-front" id="card-front">正面問題</div>
+                <div class="card-face card-back" id="card-back">背面答案</div>
             </div>
         </div>
-        <p style="font-size: 0.8rem; color: #888; margin-top:5px;">*支援鍵盤 上下左右方向鍵。駕駛坦克觸碰文書進行判定，小心紅磚牆！</p>
+        <div class="card-controls">
+            <button class="menu-btn blue card-btn" onclick="prevCard()">上一張</button>
+            <span id="card-counter" style="color:white; font-size:clamp(18px, 4.5vw, 24px); text-shadow:2px 2px #000;">1 / 5</span>
+            <button class="menu-btn blue card-btn" onclick="nextCard()">下一張</button>
+        </div>
+    </div>
 
-        <div id="tank-action-modal" class="game-modal" style="border-color: var(--neon-blue);">
-            <h3 style="color: var(--neon-blue);">>> 發現目標文件</h3>
-            <p style="font-size: 1.5rem; color: #fff; font-weight:bold; text-align:center;">【<span id="tm-doc-name"></span>】</p>
-            <p style="color: #ccc; text-align:center;">請選擇對應的行動指令：</p>
-            <div style="display:flex; justify-content:center; gap:10px;">
-                <button class="btn secondary" onclick="executeTankAction('fire')">🔴 發射摧毀</button>
-                <button class="btn" onclick="executeTankAction('friendly')">🤝 營救友軍</button>
+    <!-- 模式 3：去挑戰 (遊戲) -->
+    <div id="game-layer">
+        <button class="back-btn" onclick="exitGame()">⬅️ 逃跑</button>
+        <div id="score-display">🍄 分數: <span id="current-score">0</span></div>
+        <div class="cloud-wrapper"><div class="cloud-body"><span class="cloud-text" id="quiz-question">題目載入中...</span></div></div>
+        <div class="bricks-container" id="bricks-container"></div>
+        <div id="mario">🐶</div>
+        <div class="ground"></div>
+
+        <div class="controls-ui">
+            <div class="d-pad-container">
+                <div class="d-pad">
+                    <div class="d-center"></div>
+                    <div class="d-btn d-up"></div><div class="d-btn d-down"></div>
+                    <div class="d-btn d-left active-btn" id="btn-left">左</div>
+                    <div class="d-btn d-right active-btn" id="btn-right">右</div>
+                </div>
+            </div>
+            <div class="action-pad-container">
+                <div class="a-btn" id="btn-jump">跳</div>
             </div>
         </div>
 
-        <div id="tank-result-modal" class="game-modal">
-            <h3 id="trm-title"></h3>
-            <p id="trm-desc"></p>
-            <button class="btn" onclick="resumeTank()">CONTINUE_</button>
+        <div id="game-msg">
+            <h2 id="msg-title"></h2><p id="msg-reward"></p><div id="msg-analysis"></div>
+            <button class="menu-btn blue card-btn" style="margin-top:15px;" onclick="nextQuizQuestion()">繼續</button>
         </div>
-    </div>
-
-    <div id="screen-win" class="screen">
-        <h1 style="font-size: 2.2rem; color: var(--neon-green); text-shadow: 0 0 20px var(--neon-green);">MISSION ACCOMPLISHED</h1>
-        <p style="font-size: 1.3rem; color: #fff;">你已成為頂尖的「禮儀文書大師」！</p>
-        <div style="font-size: 80px; margin: 20px 0; text-shadow: 0 0 20px var(--neon-yellow);">🏆🏅👾</div>
-        <div style="border: 2px dashed var(--neon-yellow); display: inline-block; padding: 20px; margin-top: 20px;">
-            <p style="font-size: 1.5rem; margin: 0; color: var(--neon-yellow);">FINAL SCORE: <span id="final-score" style="font-size:2.5rem; font-weight:bold;">0</span></p>
-        </div><br>
-        <button class="btn secondary" onclick="location.reload()">RESTART SYSTEM_</button>
     </div>
 
 </div>
 
 <script>
-    /* ================= 8-bit 音效引擎 (Web Audio API) ================= */
+    // --- 音效系統 ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
-
-    function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new AudioContext();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-    }
-
+    function initAudio() { if (!audioCtx) audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
     function playSound(type) {
-        initAudio();
-        if (!audioCtx) return;
-
+        if (!audioCtx) initAudio(); if (!audioCtx) return;
+        const osc = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
+        osc.connect(gainNode); gainNode.connect(audioCtx.destination);
         const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
         if (type === 'click') {
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(600, now);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-            osc.start(now);
-            osc.stop(now + 0.1);
-        } else if (type === 'shoot') {
+            osc.type = 'square'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+            gainNode.gain.setValueAtTime(0.05, now); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        } else if (type === 'jump') {
+            osc.type = 'square'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(300, now + 0.2);
+            gainNode.gain.setValueAtTime(0.05, now); gainNode.gain.linearRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
+        } else if (type === 'hit') {
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
+            gainNode.gain.setValueAtTime(0.2, now); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        } else if (type === 'correct') {
+            osc.type = 'square'; osc.frequency.setValueAtTime(987.77, now); osc.frequency.setValueAtTime(1318.51, now + 0.1);
+            gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.setValueAtTime(0.1, now + 0.1); gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
+            osc.start(now); osc.stop(now + 0.4);
+        } else if (type === 'wrong') {
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.linearRampToValueAtTime(100, now + 0.3);
+            gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+        } else if (type === 'win') {
             osc.type = 'square';
-            osc.frequency.setValueAtTime(880, now);
-            osc.frequency.exponentialRampToValueAtTime(110, now + 0.15);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-            osc.start(now);
-            osc.stop(now + 0.15);
-        } else if (type === 'hit_correct') { // 叮！金幣聲
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(987.77, now); // B5
-            osc.frequency.setValueAtTime(1318.51, now + 0.1); // E6
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.3);
-            osc.start(now);
-            osc.stop(now + 0.3);
-        } else if (type === 'error') { // 錯誤警告聲
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(150, now);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.3);
-            osc.start(now);
-            osc.stop(now + 0.3);
-        } else if (type === 'rescue') { // 歡樂升調
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(440, now);
-            osc.frequency.setValueAtTime(554.37, now + 0.1);
-            osc.frequency.setValueAtTime(659.25, now + 0.2);
-            osc.frequency.setValueAtTime(880, now + 0.3);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.5);
-            osc.start(now);
-            osc.stop(now + 0.5);
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => { osc.frequency.setValueAtTime(freq, now + i * 0.12); });
+            gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.linearRampToValueAtTime(0, now + 0.6);
+            osc.start(now); osc.stop(now + 0.6);
         }
     }
 
-    function playExplosion() {
+    document.addEventListener('pointerdown', (e) => {
         initAudio();
-        if (!audioCtx) return;
-        const now = audioCtx.currentTime;
-        const bufferSize = audioCtx.sampleRate * 0.5; // 0.5秒
-        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1; // 白噪音
+        if (e.target.closest('button') || e.target.closest('.flashcard-container')) {
+            if (e.target.closest('.a-btn') || e.target.closest('.d-btn')) return;
+            playSound('click');
         }
-        const noise = audioCtx.createBufferSource();
-        noise.buffer = buffer;
-        
-        const filter = audioCtx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(1000, now);
-        filter.frequency.exponentialRampToValueAtTime(100, now + 0.5);
-
-        const gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-
-        noise.connect(filter);
-        filter.connect(gain);
-        gain.connect(audioCtx.destination);
-        noise.start(now);
-    }
-
-    /* ================= 遊戲核心變數 ================= */
-    let score = 0;
-    function updateScore(points) {
-        score += points;
-        document.getElementById('score').innerText = score;
-    }
-    function switchScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-    }
-    function startGame() {
-        playSound('click');
-        switchScreen('screen-level1');
-        initLevel1();
-    }
-
-    /* ================= 第一關邏輯 ================= */
-    const l1Answers = ["禮節", "溫暖", "格式", "得體", "交際", "友誼"];
-    let l1CurrentState = [null, null, null, null, null, null];
-    let l1SelectedBlank = null;
-
-    function initLevel1() {
-        let words = [...l1Answers].sort(() => Math.random() - 0.5);
-        const bank = document.getElementById('l1-words');
-        bank.innerHTML = '<span style="color:var(--neon-blue); font-weight:bold; margin-right:10px;">[DATA_BANK]:</span>';
-        words.forEach(word => {
-            let btn = document.createElement('button');
-            btn.className = 'word-btn'; btn.innerText = word;
-            btn.onclick = () => fillBlank(word, btn);
-            bank.appendChild(btn);
-        });
-        selectBlank(0);
-    }
-    function selectBlank(index) {
-        playSound('click');
-        document.querySelectorAll('.blank').forEach(b => b.classList.remove('selected'));
-        l1SelectedBlank = index;
-        document.querySelector(`.blank[data-id="${index}"]`).classList.add('selected');
-    }
-    function fillBlank(word, btn) {
-        playSound('click');
-        if (l1SelectedBlank !== null) {
-            let blankEl = document.querySelector(`.blank[data-id="${l1SelectedBlank}"]`);
-            if (l1CurrentState[l1SelectedBlank]) {
-                let oldWord = l1CurrentState[l1SelectedBlank];
-                let newBtn = document.createElement('button');
-                newBtn.className = 'word-btn'; newBtn.innerText = oldWord;
-                newBtn.onclick = () => fillBlank(oldWord, newBtn);
-                document.getElementById('l1-words').appendChild(newBtn);
-            }
-            blankEl.innerText = word;
-            l1CurrentState[l1SelectedBlank] = word;
-            btn.remove();
-            blankEl.classList.remove('selected');
-            l1SelectedBlank = null;
-            for(let i=0; i<6; i++) { if(!l1CurrentState[i]){ selectBlank(i); break; } }
-        }
-    }
-    document.querySelectorAll('.blank').addEventListener = function() {}; 
-    document.querySelectorAll('.blank').forEach(blank => {
-        blank.onclick = function() {
-            let idx = this.getAttribute('data-id');
-            if(l1CurrentState[idx]) {
-                playSound('click');
-                let oldWord = l1CurrentState[idx];
-                let newBtn = document.createElement('button');
-                newBtn.className = 'word-btn'; newBtn.innerText = oldWord;
-                newBtn.onclick = () => fillBlank(oldWord, newBtn);
-                document.getElementById('l1-words').appendChild(newBtn);
-                this.innerText = ""; l1CurrentState[idx] = null;
-            }
-        };
     });
-    function checkLevel1() {
-        playSound('click');
-        let correctCount = 0; let allFilled = true;
-        for(let i=0; i<6; i++) {
-            if(!l1CurrentState[i]) allFilled = false;
-            if(l1CurrentState[i] === l1Answers[i]) correctCount++;
+
+    // --- 💡 寫作重點提示資料庫 (支援 HTML 換行與重點顏色) ---
+    const tipData = {
+        thanks: {
+            salutation: { title: "上款", text: "寫清楚收信人的機構名稱、職銜及姓名，並加上「台鑒」以表示尊敬。<br><br><span style='color:#e74c3c;'>💡 詞語解釋：</span><br>「台鑒」是傳統書信中請平輩或長輩看信的敬辭，帶有請對方明察的意思。" },
+            title: { title: "標題", text: "必須置中排列，並且要扼要說明信件的目的（例如：感謝接待參觀食品廠）。" },
+            p1: { title: "第一段", text: "點明活動的具體日期與地點，並直接向對方表達誠摯的感謝之情。" },
+            p2: { title: "第二段", text: "具體說明活動的收穫（如：印證課堂知識），讓感謝顯得具體真誠而不空泛。" },
+            p3: { title: "第三段", text: "重申謝意，並表達對雙方未來交流或合作的期盼。" },
+            closing: { title: "祝頌語", text: "對長輩使用文言祝頌語。分兩行：第一行空兩格寫「恭頌」，第二行頂格寫祝福語（如「鈞安」）。<br><br><span style='color:#e74c3c;'>💡 詞語解釋：</span><br>「恭頌 鈞安」的白話意思是「恭敬地祝您平安 / 安好」。" },
+            signoff: { title: "下款", text: "整體靠右對齊，包含發信機構、身分、姓名及「謹啟」，並使用中文大寫日期。" }
+        },
+        invitation: {
+            salutation: { title: "上款", text: "準確寫出對方的機構與職銜（如：院長 李國強教授 道鑒），以示最高敬意。<br><br><span style='color:#e74c3c;'>💡 詞語解釋：</span><br>「道鑒」是專用於教育界或學術界人士的提稱語（敬辭），尊稱對方有道德學問，請其明察。" },
+            title: { title: "標題", text: "必須置中排列，並清晰點明邀請的主題（如：邀請參與實習計劃）。" },
+            p1: { title: "第一段", text: "說明發出邀請的背景或緣由（例如承接先前的活動），並正式提出邀請。" },
+            p2: { title: "第二段", text: "簡述活動或計劃的具體內容（如時間、地點、實習內容）以及對受邀者的益處。" },
+            p3: { title: "第三段", text: "附上明確的回覆期限、聯絡方式，並加上收結語「專此，候覆。」" },
+            closing: { title: "祝頌語", text: "使用文言祝頌語「順頌 教安」，排版上「順頌」前須留空兩格，「教安」必須頂格。<br><br><span style='color:#e74c3c;'>💡 詞語解釋：</span><br>「順頌 教安」的意思是「順便祝您教務安康」，是專門寫給教育界人士的祝福語。" },
+            signoff: { title: "下款", text: "整體靠右對齊，發信人身分與姓名下加「謹啟」，並使用中文大寫日期。" }
+        },
+        sympathy: {
+            salutation: { title: "上款", text: "平輩同學間直接稱呼姓名即可，不需加「台鑒」等提稱語，以表達親切與溫暖。" },
+            p1: { title: "第一段", text: "點出得知意外事件的擔心，並代表班級或機構表達最真誠的慰問。" },
+            p2: { title: "第二段", text: "勸慰對方安心靜養，並主動提出具體的協助方案（如幫忙補筆記），讓對方無後顧之憂。" },
+            p3: { title: "第三段", text: "說明後續的探訪計劃，並表達隨時願意提供幫助的善意。" },
+            closing: { title: "祝頌語", text: "常祝願「早日康復」；平輩間不需要使用過於正式的文言文祝頌語。" },
+            signoff: { title: "下款", text: "平輩之間使用「啟」或「上」即可，不需用太正式的「謹啟」。" }
         }
-        const fb = document.getElementById('l1-feedback');
-        if(!allFilled) { fb.style.color = "var(--neon-pink)"; fb.innerText = ">> ERROR: 數據未填滿"; playSound('error'); return; }
-        
-        if (correctCount === 6) {
-            updateScore(2);
-            playSound('hit_correct');
-            fb.style.color = "var(--neon-green)"; fb.innerText = ">> SUCCESS! (+2) 系統解鎖，進入空戰模式...";
-            setTimeout(() => { switchScreen('screen-level2'); initLevel2Shooter(); }, 1500);
+    };
+
+    function showTip(letterKey, partKey) {
+        const data = tipData[letterKey][partKey];
+        document.getElementById('tip-title').innerText = data.title;
+        // 改為 innerHTML 以渲染 <br> 標籤與顏色樣式
+        document.getElementById('tip-content').innerHTML = data.text;
+        document.getElementById('tip-panel').classList.add('show');
+    }
+    function hideTip() {
+        document.getElementById('tip-panel').classList.remove('show');
+    }
+
+    // --- 資料庫 (引入「道鑒」及排版更新) ---
+    const db = {
+        thanks: {
+            title: "感謝信",
+            content: `
+                <span><b>樂口福食品廠<br>行政部 陳經理 台鑒：</b></span> <button class="tip-btn" onclick="showTip('thanks', 'salutation')">💡</button><br><br>
+                <div style="text-align: center;"><b>感謝接待參觀食品廠</b> <button class="tip-btn" onclick="showTip('thanks', 'title')">💡</button></div><br>
+                　　我們是香港專業教育學院（VTC）食品科技及安全高級文憑二年級A班的全體師生。本班一行三十人於二零二五年二月十日榮幸獲准前往 貴廠進行實地參觀，期間承蒙 閣下在百忙之中抽空親自接待，並作出周密妥善的安排，我們在此謹代表全體師生，向 閣下致以最誠摯的謝意。 <button class="tip-btn" onclick="showTip('thanks', 'p1')">💡</button><br><br>
+                　　在是次的參觀活動中，經由 閣下的詳細講解與帶領，同學們得以深入廠房，親身了解現代化食品生產的嚴謹流程、品質監控標準以及 貴廠卓越的企業文化。這不僅印證了我們在課堂上學到的理論知識，更讓我們大開眼界，獲益良多。 <button class="tip-btn" onclick="showTip('thanks', 'p2')">💡</button><br><br>
+                　　閣下對教育事業的支持及對年輕學子的栽培之心，我們深表敬佩與感激。希望日後能有更多機會與 閣下交流學習。<br><br>
+                　　再次感謝 閣下的熱情款待！ <button class="tip-btn" onclick="showTip('thanks', 'p3')">💡</button><br><br>
+                　　恭頌<br>鈞安 <button class="tip-btn" onclick="showTip('thanks', 'closing')">💡</button><br><br>
+                <div style="text-align:right;">香港專業教育學院（VTC）<br>食品科技及安全高級文憑二年級A班 班代表<br>張家豪 謹啟<br>二零二五年二月十五日 <button class="tip-btn" onclick="showTip('thanks', 'signoff')">💡</button></div>
+            `,
+            cards: [
+                { q: "感謝信的「上款」需要包含哪些資訊？", a: "寫清楚收信人的機構名稱、職銜及姓名，並加上「台鑒」以表示尊敬。" },
+                { q: "感謝信「標題」的排版與內容要求？", a: "必須置中排列，並且要扼要說明信件的目的（例如：感謝接待參觀食品廠）。" },
+                { q: "感謝信正文「第一段」的核心重點是？", a: "點明活動的具體日期與地點，並直接向對方表達誠摯的感謝之情。" },
+                { q: "感謝信正文「第二段」的核心重點是？", a: "具體說明活動的收穫（如：印證課堂知識），讓感謝顯得具體真誠而不空泛。" },
+                { q: "感謝信正文「第三段」的核心重點是？", a: "重申謝意，並表達對雙方未來交流或合作的期盼。" },
+                { q: "感謝信「祝頌語」的正確寫作特點？", a: "對長輩常使用文言祝頌語。排版上第一行空兩格寫「恭頌」，第二行頂格寫祝福語（如「鈞安」）。" },
+                { q: "感謝信「下款」的排版與寫作特點？", a: "整體靠右對齊，包含發信機構、身分、姓名及「謹啟」，並使用中文大寫日期。" }
+            ],
+            quiz: [
+                { q: "感謝信上款最適當的寫法是？", opts: ["樂口福食品廠陳經理 台鑒", "給陳經理", "陳大文 收"], ans: 0, rationales: ["正確！正式禮儀文書的上款必須包含完整的機構名稱、職銜及敬辭（台鑒）以示尊敬。", "錯誤。「給」字過於口語，且缺乏全名與正式敬辭，顯得不夠莊重。", "錯誤。「收」字通常用於信封上的郵寄地址欄，絕不適用於信件內文的開頭。"] },
+                { q: "感謝信標題的排版與內容要求是？", opts: ["靠左，寫上感謝信", "置中，扼要說明目的", "靠右，詳細解釋事由"], ans: 1, rationales: ["錯誤。標題不應靠左排列，且「感謝信」三個字未具體說明感謝的事由。", "正確！標題的作用是讓收信人一眼看出主旨，必須置中並扼要說明目的。", "錯誤。標題排版不應靠右，且不需要在標題欄長篇大論解釋事由。"] },
+                { q: "為了讓感謝信顯得真誠，正文第二段應該包含什麼？", opts: ["重複活動的日期時間", "提出對廠商的批評建議", "具體說明活動的收穫"], ans: 2, rationales: ["錯誤。第一段已交代過時間地點，重複已知資訊會讓信件顯得冗長空泛。", "錯誤。感謝信的核心是表達感激，加入批評會嚴重偏離主題並破壞雙方關係。", "正確！提出具體得著（如印證課堂所學）能證明你們的重視，讓收信人覺得付出有價值。"] },
+                { q: "正文第三段（結尾段）的主要功能是？", opts: ["重申謝意與期盼未來合作", "要求對方必須回信", "列出交通費的報銷清單"], ans: 0, rationales: ["正確！在收結處再次感謝能加深印象，並釋出未來繼續保持良好關係的善意。", "錯誤。感謝信是單向傳達感激之情的文書，強制要求回覆顯得咄咄逼人。", "錯誤。行政或財務事宜必須透過其他專門文件處理，絕不可混入感謝信中。"] },
+                { q: "在祝頌語中，寫給長輩的文言敬辭「恭頌 鈞安」應該如何排版？", opts: ["與恭頌放在同一行", "換行並頂格書寫", "換行並退兩格書寫"], ans: 1, rationales: ["錯誤。不分行會破壞祝頌語的固定格式結構，顯得不夠正式。", "正確！傳統格式中，「恭頌」前需空兩格，祝福的字句（鈞安）換行並「頂格」書寫，能顯示對長輩或收信人的最高敬意。", "錯誤。祝福語如果退格書寫，在傳統禮節上代表敬意不足。"] },
+                { q: "感謝信下款的署名與日期排版要求是？", opts: ["必須全部置中", "必須整體靠左對齊", "必須整體靠右對齊"], ans: 2, rationales: ["錯誤。下款置中對齊不符合中文禮儀文書的規範。", "錯誤。整體靠左對齊通常是一般便條的寫法，缺乏正式文件的嚴肅感。", "正確！正式文書的下款署名及中文大寫日期，必須整體靠右對齊。"] }
+            ]
+        },
+        invitation: {
+            title: "邀請信",
+            content: `
+                <span><b>香港專業教育學院（VTC）<br>院長 李國強教授 道鑒：</b></span> <button class="tip-btn" onclick="showTip('invitation', 'salutation')">💡</button><br><br>
+                <div style="text-align: center;"><b>邀請參與實習計劃</b> <button class="tip-btn" onclick="showTip('invitation', 'title')">💡</button></div><br>
+                　　自 貴院師生於本年二月蒞臨本廠參觀交流後，本廠對 貴院學生的好學精神、專業知識及嚴謹態度留下了深刻的印象。為進一步加強雙方合作，並為業界培育更多優秀的食品科技人才，本廠誠意邀請 貴院學生參與本年度的「樂口福食品廠學生實習計劃」。 <button class="tip-btn" onclick="showTip('invitation', 'p1')">💡</button><br><br>
+                　　是次實習計劃暫定期於本年暑期（七月至八月）進行，為期共六星期。實習期間，學生將獲安排至生產部及品質檢定部，親身參與現代化食品的生產運作與品質監控流程。 <button class="tip-btn" onclick="showTip('invitation', 'p2')">💡</button><br><br>
+                　　隨函附上實習計劃之詳細資料。如蒙 俯允，懇請於本年五月十五日前惠覆，以便本廠作進一步的統籌與安排。如有任何查詢，歡迎隨時致電 2345 6789 與本人聯絡。專此，候覆。 <button class="tip-btn" onclick="showTip('invitation', 'p3')">💡</button><br><br>
+                　　順頌<br>教安 <button class="tip-btn" onclick="showTip('invitation', 'closing')">💡</button><br><br>
+                <div style="text-align:right;">樂口福食品廠<br>行政部經理<br>陳大文 謹啟<br>二零二五年四月十日 <button class="tip-btn" onclick="showTip('invitation', 'signoff')">💡</button></div>
+            `,
+            cards: [
+                { q: "邀請信「上款」的必備元素與寫作特點？", a: "準確寫出對方的機構與職銜（如：院長 李國強教授 道鑒），以示最高敬意。" },
+                { q: "邀請信「標題」的排版要求與功能？", a: "必須置中排列，並清晰點明邀請的主題（如：邀請參與實習計劃）。" },
+                { q: "邀請信正文「第一段」的核心重點是？", a: "說明發出邀請的背景或緣由（例如承接先前的活動），並正式提出邀請。" },
+                { q: "邀請信正文「第二段」的核心重點是？", a: "簡述活動或計劃的具體內容（如時間、地點、實習內容）以及對受邀者的益處。" },
+                { q: "邀請信正文「第三段」的核心重點是？", a: "附上明確的回覆期限、聯絡方式，並加上收結語「專此，候覆。」" },
+                { q: "寫給教育界人士的「祝頌語」與排版特點？", a: "使用文言祝頌語「順頌 教安」，排版上「順頌」前須留空兩格，「教安」必須頂格。" },
+                { q: "傳統中文書信中的「挪抬」是甚麼意思？", a: "提到對方或其機構時（如「 貴院」、「 俯允」），前方空一格以示對收信人的尊敬。" }
+            ],
+            quiz: [
+                { q: "寫給教育機構院長的上款，加上哪個敬辭（提稱語）最為恰當？", opts: ["敬啟", "道鑒", "拜啟"], ans: 1, rationales: ["錯誤。「敬啟」是發信人用於自己署名後的謙辭（恭敬地陳述），不可用於稱呼對方。", "正確！「道鑒」是專門用於教育界、學術界人士（如校長、教授）的提稱語，尊稱對方有道德學問，請其明察。", "錯誤。「拜啟」多用於日文書信或極早期的古文，不適用於現代商業或禮儀文書。"] },
+                { q: "邀請信正文第一段的核心重點是？", opts: ["邀請的背景與正式提出邀請", "詳細的活動流程與時間表", "公司的歷史介紹"], ans: 0, rationales: ["正確！第一段必須迅速建立語境，點明緣由並正式發出邀請。", "錯誤。活動的詳細時間、地點與內容，應該放在第二段（主體段落）中說明。", "錯誤。第一段應直入主題，過多與邀請無關的歷史介紹會讓信件失去焦點。"] },
+                { q: "信中提到對方機構「__院」時，前面為何要空一格？", opts: ["排版時不小心打錯", "為了湊字數", "挪抬，表示對收信人的尊敬"], ans: 2, rationales: ["錯誤。這是傳統書信中有意為之的排版規則，並非錯字。", "錯誤。公文寫作講求精煉，不需要湊字數。", "正確！提及對方機構或行為時前方空一格（稱為「挪抬」），是傳統表達敬意的標準做法。"] },
+                { q: "邀請信中請求對方答應的專用敬辭是？", opts: ["拜託", "俯允", "惠覆"], ans: 1, rationales: ["錯誤。「拜託」過於口語化，不適合用於正式的公函或邀請信。", "正確！「俯允」是謙卑地請求對方答應或允許的專用文言敬辭（如：如蒙 俯允）。", "錯誤。「惠覆」是請求對方「回信」的敬辭，而不是請求「答應」。"] },
+                { q: "寫給教育界人士的文言祝頌語，排版正確的是？", opts: ["全部置中排列", "順頌 教安 (放在同一行)", "順頌空兩格，教安頂格"], ans: 2, rationales: ["錯誤。祝頌語有其固定的排列規則，不應整體置中。", "錯誤。將「順頌」與「教安」放同一行會破壞書信結構，無法展現對收信人的敬意。", "正確！「順頌」前須留空兩格，「教安」必須換行且頂格書寫，以示最高尊敬。"] },
+                { q: "信件結尾「懇請於本年五月十五日前__」，空格應填入？", opts: ["答覆", "惠覆", "回信"], ans: 1, rationales: ["錯誤。「答覆」較為中性，缺乏對收信人的尊稱意味。", "正確！「惠覆」是請人回信時最標準、最有禮貌的敬辭。", "錯誤。「回信」太過口語，不符合邀請信應有的莊重感。"] }
+            ]
+        },
+        sympathy: {
+            title: "慰問信",
+            content: `
+                <span><b>陳小明同學：</b></span> <button class="tip-btn" onclick="showTip('sympathy', 'salutation')">💡</button><br><br>
+                　　得知你昨天放學回家途中不幸發生交通意外受傷，需要留院治療，班主任和全班同學都非常擔心你的情況。今天，我代表食品科技及安全高級文憑二年級A班的全體同學，向你送上最真誠的慰問。 <button class="tip-btn" onclick="showTip('sympathy', 'p1')">💡</button><br><br>
+                　　今天得知你沒有大礙，目前情況穩定，大家才鬆了一口氣。現在最重要的是身體健康，希望你在醫院能安心靜養，好好聽從醫生的吩咐。至於功課和課堂筆記，你千萬不要擔心，我們已經幫你妥善整理好，等你回來後大家一定會全力幫你補回進度。 <button class="tip-btn" onclick="showTip('sympathy', 'p2')">💡</button><br><br>
+                　　我們準備了一點小心意，幾位同學也打算在這個週末代表全班到醫院探望你，希望能為你打打氣。如果你或家人在這段時間有任何需要幫忙的地方，請隨時跟我們聯絡。<br><br>
+                　　好好休息，我們等著你完全康復，早日回歸校園和我們一起上課！ <button class="tip-btn" onclick="showTip('sympathy', 'p3')">💡</button><br><br>
+                　　祝<br>早日康復<br>平安健康 <button class="tip-btn" onclick="showTip('sympathy', 'closing')">💡</button><br><br>
+                <div style="text-align:right;">食品科技及安全高級文憑二年級A班<br>班代表<br>張家豪 啟<br>二零二六年三月五日 <button class="tip-btn" onclick="showTip('sympathy', 'signoff')">💡</button></div>
+            `,
+            cards: [
+                { q: "同學間慰問信的「上款」有何寫作特點？", a: "平輩同學間直接稱呼姓名即可，不需加「台鑒」以表達親切與溫暖。" },
+                { q: "慰問信的「標題」寫作特點？", a: "可以置中寫明具體事由、或只寫「慰問信」；也可為了表達親切感而完全省略標題，避免過於生硬。" },
+                { q: "慰問信正文「第一段」的核心重點是？", a: "點出得知意外事件的擔心，並代表班級或機構表達最真誠的慰慰。" },
+                { q: "慰問信正文「第二段」的核心重點是？", a: "勸慰對方安心靜養，並主動提出具體的協助方案（如幫忙補筆記），讓對方無後顧之憂。" },
+                { q: "慰問信正文「第三段」的核心重點是？", a: "說明後續的探訪計劃，並表達隨時願意提供幫助的善意。" },
+                { q: "慰問信的「祝頌語」與「下款」特點？", a: "常祝願「早日康復」；下款平輩之間使用「啟」或「上」即可，不需用太正式的「謹啟」。" }
+            ],
+            quiz: [
+                { q: "同學之間的慰問信，上款稱呼最適合的是？", opts: ["敬愛的陳小明：", "陳小明同學 台鑒", "陳小明同學："], ans: 2, rationales: ["錯誤。「敬愛的」通常用於對長輩或師長，用在同學身上太過隆重且不自然。", "錯誤。平輩同學之間無需使用「台鑒」，否則會顯得太有距離感。", "正確！同學間直接稱呼姓名即可，既有禮貌又能展現親切與溫暖。"] },
+                { q: "同學間的慰問信，關於「標題」的處理，下列何者最適當？", opts: ["可以省略標題，以表達親切感", "必須詳細寫出受傷經過", "標題必須靠右對齊"], ans: 0, rationales: ["正確！為了避免公事公辦的生硬感，平輩間的慰問信可完全省略標題，顯得更溫暖親切。", "錯誤。標題只要扼要點明事由（或直接省略）即可，不應在標題長篇大論。", "錯誤。如果決定要寫標題，格式上必須是「置中」排列，而非靠右。"] },
+                { q: "正文第一段應該表達怎樣的語氣？", opts: ["嚴厲指責他不小心", "擔心與真誠的慰問", "平淡無奇的陳述"], ans: 1, rationales: ["錯誤。受傷的同學最需要的是安慰，指責會讓對方感到壓力與難過。", "正確！第一段應點出得知意外的擔心，並代表班級送上最真誠的關懷。", "錯誤。慰問信的核心在於「同理心」，平淡的陳述無法傳達溫暖的情感。"] },
+                { q: "為了讓受傷同學安心，正文第二段通常會加入甚麼內容？", opts: ["主動提出具體的課業協助", "要求他趕快出院", "抱怨他拖累了全班進度"], ans: 0, rationales: ["正確！提供實質幫助（如代為整理筆記），能讓對方無後顧之憂地安心休養。", "錯誤。慰問信應勸慰對方聽從醫囑、安心靜養，不該給予出院壓力。", "錯誤。這充滿惡意，完全違背了慰問信關懷與支持的本意。"] },
+                { q: "正文第三段提及「探訪計劃」的目的是甚麼？", opts: ["去醫院玩樂", "表達隨時願意提供幫助與溫暖", "去檢查他是不是裝病"], ans: 1, rationales: ["錯誤。醫院是需要安靜休養的地方，探訪絕不是為了玩樂。", "正確！提及探訪能傳達全體同學的支持，給予受傷同學精神上的鼓勵。", "錯誤。這缺乏對同學的基本信任，不該出現於表達善意的文書中。"] },
+                { q: "平輩同學之間的署名，最適當的啟辭是？", opts: ["謹啟", "啟", "敬啟"], ans: 1, rationales: ["錯誤。「謹啟」代表非常恭敬地陳述，用於對長輩或上級，對平輩使用過於隆重。", "正確！平輩同學之間的署名，簡單用「啟」或「上」即可，既有禮貌又親切。", "錯誤。「敬啟」同樣帶有對長輩的恭敬意味，不適用於平輩。"] }
+            ]
+        }
+    };
+
+    // --- 系統狀態 ---
+    let currentDataKey = '';
+    let cardIndex = 0;
+    
+    let gameWidth = window.innerWidth;
+    function updateGameDimensions() {
+        const gw = document.getElementById('game-window');
+        if (gw) gameWidth = gw.clientWidth;
+    }
+    window.addEventListener('resize', updateGameDimensions);
+
+    // --- 介面切換 ---
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen, #game-layer').forEach(el => {
+            el.classList.remove('active');
+            if(el.id === 'game-layer') el.style.display = 'none';
+        });
+        hideTip(); // 切換畫面時自動隱藏重點提示卡片
+        const target = document.getElementById(screenId);
+        if(target.id === 'game-layer') {
+            target.style.display = 'block';
         } else {
-            updateScore(-1);
-            playSound('error');
-            fb.style.color = "var(--neon-pink)"; fb.innerText = `>> ERROR: 驗證失敗，扣 1 分。重置系統...`;
-            l1CurrentState = [null, null, null, null, null, null];
-            document.querySelectorAll('.blank').forEach(b => b.innerText = ''); initLevel1();
+            target.classList.add('active');
+            target.scrollTo(0, 0); 
         }
     }
 
-    /* ================= 第二關：飛機射擊 ================= */
-    const l2Items = [
-        { name: "投訴信", isDoc: false, desc: "向有關當局或機構表達強烈不滿，要求改善或賠償。" },
-        { name: "慰問信", isDoc: true, desc: "對遭遇不幸、挫折或患病的人表示同情、安慰與鼓勵。" },
-        { name: "邀請信", isDoc: true, desc: "誠懇有禮地邀請受文者出席特定活動或擔任嘉賓。" },
-        { name: "會議紀錄", isDoc: false, desc: "客觀如實地記錄會議的討論過程及最終決議。" },
-        { name: "請柬", isDoc: true, desc: "莊重、美觀地邀請賓客出席隆重的慶典或宴會。" },
-        { name: "尋人啟事", isDoc: false, desc: "透過大眾媒體或公開張貼，尋找失蹤人士。" },
-        { name: "新聞報道", isDoc: false, desc: "迅速、客觀地向公眾傳達最新發生的事實。" },
-        { name: "感謝信", isDoc: true, desc: "向曾給予幫助或關懷的人表達真摯的感激之情。" },
-        { name: "工作計劃", isDoc: false, desc: "部署未來的工作目標、具體步驟與資源分配。" },
-        { name: "通告", isDoc: false, desc: "向公眾或下屬公佈需要知悉或遵守的事項。" },
-        { name: "賀卡", isDoc: true, desc: "在特定節日或喜慶日子，為別人送上溫暖的祝福。" },
-        { name: "通知", isDoc: false, desc: "傳達上級指示、佈達會議或告知具體辦理事項。" },
-        { name: "道歉信", isDoc: true, desc: "承認錯誤，表達誠懇的歉意，並希望取得諒解。" },
-        { name: "廣告", isDoc: false, desc: "宣傳商品或服務，以吸引消費者購買或使用。" },
-        { name: "合同", isDoc: false, desc: "確立雙方權利與義務，具有法律效力的協議文件。" },
-        { name: "守則", isDoc: false, desc: "規定特定群體必須遵守的行為準則與紀律要求。" },
-        { name: "祝酒辭", isDoc: true, desc: "在宴會上發表，以表達祝賀與美好祝願的言辭。" },
-        { name: "商品說明書", isDoc: false, desc: "客觀、準確地介紹商品特點與操作方法。" },
-        { name: "建議書", isDoc: false, desc: "針對特定問題，提出具建設性的意見或改善方案。" },
-        { name: "悼辭", isDoc: true, desc: "哀悼死者，追述其生平事蹟與貢獻，表達哀思。" }
-    ]; 
-    const L2_TOTAL_TARGETS = 8;
+    function selectLetter(key) {
+        currentDataKey = key;
+        document.getElementById('mode-title').innerText = db[key].title;
+        showScreen('screen-mode');
+    }
 
-    let shooterCanvas, playerPlane;
-    let sPlayerX = 50;
-    
-    let sKeys = { left: false, right: false };
-    let sMoveDir = 0;
-    
-    let sBullets = [];
-    let sEnemies = [];
-    let sEnemyPool = [];
-    let sGameLoopId;
-    let isShooterRunning = false;
-    let sCaughtCount = 0;
-    let sMissedCount = 0;
-    let sSpawnTimer = 0;
-    let lastSpawnX = -100;
+    function startMode(mode) {
+        const data = db[currentDataKey];
+        if(mode === 'read') {
+            document.getElementById('reader-content').innerHTML = data.content;
+            showScreen('screen-read');
+        } else if (mode === 'cards') {
+            cardIndex = 0;
+            updateCardUI();
+            showScreen('screen-cards');
+        } else if (mode === 'quiz') {
+            startMarioGame();
+        }
+    }
 
-    function initLevel2Shooter() {
-        shooterCanvas = document.getElementById('shooter-container');
-        playerPlane = document.getElementById('player-plane');
+    // --- 閃卡邏輯 ---
+    function updateCardUI() {
+        const cards = db[currentDataKey].cards;
+        document.getElementById('flashcard').classList.remove('is-flipped');
         
-        sPlayerX = 50; playerPlane.style.left = sPlayerX + '%';
-        sKeys = { left: false, right: false };
-        sMoveDir = 0;
-        sBullets.forEach(b => b.el.remove()); sBullets = [];
-        sEnemies.forEach(e => e.el.remove()); sEnemies = [];
-        sCaughtCount = 0; sMissedCount = 0;
-        sSpawnTimer = 0;
-        lastSpawnX = -100;
+        setTimeout(() => {
+            document.getElementById('card-front').innerText = cards[cardIndex].q;
+            document.getElementById('card-back').innerText = cards[cardIndex].a;
+            document.getElementById('card-counter').innerText = `${cardIndex + 1} / ${cards.length}`;
+        }, 150);
+    }
+    function flipCard() { document.getElementById('flashcard').classList.toggle('is-flipped'); }
+    function nextCard() { const cards = db[currentDataKey].cards; if(cardIndex < cards.length - 1) { cardIndex++; updateCardUI(); } }
+    function prevCard() { if(cardIndex > 0) { cardIndex--; updateCardUI(); } }
+
+    // --- 測驗遊戲引擎 ---
+    let gameLoop;
+    let quizIndex = 0;
+    let currentScore = 0;
+    let isGameRunning = false;
+    let hasAnswered = false;
+
+    const mState = { x: 0, y: 0, vx: 0, vy: 0, width: 60, height: 80, isGrounded: true, speed: 6, jumpPower: -19, gravity: 0.8 };
+    const keys = { left: false, right: false, jump: false };
+
+    function startMarioGame() {
+        showScreen('game-layer');
+        quizIndex = 0; currentScore = 0; 
+        updateScoreDisplay(); updateGameDimensions(); 
+        loadQuizQuestion();
         
-        document.getElementById('l2-feedback').innerText = `已擊落目標：0 / ${L2_TOTAL_TARGETS}`;
+        bindControls();
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
 
-        sEnemyPool = [...l2Items].sort(() => Math.random() - 0.5);
+        isGameRunning = true;
+        requestAnimationFrame(physicsLoop);
+    }
+
+    function exitGame() {
+        isGameRunning = false;
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('keyup', handleKeyUp);
+        showScreen('screen-mode');
+    }
+
+    function updateScoreDisplay() { document.getElementById('current-score').innerText = currentScore; }
+
+    function loadQuizQuestion() {
+        hasAnswered = false;
+        const qData = db[currentDataKey].quiz[quizIndex];
+        document.getElementById('quiz-question').innerText = qData.q;
         
-        document.addEventListener('keydown', handleShooterKeyDown);
-        document.addEventListener('keyup', handleShooterKeyUp);
+        const container = document.getElementById('bricks-container');
+        container.innerHTML = '';
         
-        isShooterRunning = true;
-        sGameLoopId = requestAnimationFrame(shooterLoop);
+        qData.opts.forEach((opt, idx) => {
+            let b = document.createElement('div');
+            b.className = 'brick'; b.innerText = opt;
+            b.dataset.index = idx; b.dataset.correct = (idx === qData.ans);
+            let item = document.createElement('div');
+            item.className = 'item-popup'; item.innerText = (idx === qData.ans) ? '🍄' : '🌺';
+            b.appendChild(item); container.appendChild(b);
+        });
+
+        mState.x = (gameWidth / 2) - (mState.width / 2); 
+        mState.y = 0; mState.vx = 0; mState.vy = 0;
+        updateMarioDOM();
     }
 
-    function handleShooterKeyDown(e) {
-        if(!isShooterRunning) return;
-        if(e.key === "ArrowLeft") { sKeys.left = true; updateMoveDir(); }
-        if(e.key === "ArrowRight") { sKeys.right = true; updateMoveDir(); }
-        if(e.key === " " || e.key === "Spacebar") { e.preventDefault(); shootBullet(); }
-    }
-    function handleShooterKeyUp(e) {
-        if(e.key === "ArrowLeft") { sKeys.left = false; updateMoveDir(); }
-        if(e.key === "ArrowRight") { sKeys.right = false; updateMoveDir(); }
-    }
+    function bindControls() {
+        const btnL = document.getElementById('btn-left');
+        const btnR = document.getElementById('btn-right');
+        const btnJ = document.getElementById('btn-jump');
 
-    function updateMoveDir() {
-        if (sKeys.left && !sKeys.right) sMoveDir = -1;
-        else if (sKeys.right && !sKeys.left) sMoveDir = 1;
-        else sMoveDir = 0;
-    }
+        const press = (key) => { keys[key] = true; };
+        const release = (key) => { keys[key] = false; };
 
-    function shootBullet() {
-        if(!isShooterRunning) return;
-        playSound('shoot'); // 加入發射音效
-        let bullet = document.createElement('div');
-        bullet.className = 'bullet';
-        bullet.style.left = `calc(${sPlayerX}% - 2px)`; 
-        bullet.style.bottom = '70px';
-        shooterCanvas.appendChild(bullet);
-        sBullets.push({ el: bullet, y: 70 });
-    }
-
-    function shooterLoop() {
-        if(!isShooterRunning) return;
-
-        if(sMoveDir !== 0) {
-            sPlayerX += sMoveDir * 3;
-            if(sPlayerX < 5) sPlayerX = 5;
-            if(sPlayerX > 95) sPlayerX = 95;
-            playerPlane.style.left = sPlayerX + '%';
-        }
-
-        sSpawnTimer++;
-        if(sSpawnTimer > 150 && sEnemyPool.length > 0) {
-            let data = sEnemyPool.shift();
-            spawnEnemy(data);
-            sSpawnTimer = 0;
-        }
-
-        for(let i = sBullets.length - 1; i >= 0; i--) {
-            let b = sBullets[i];
-            b.y += 6;
-            b.el.style.bottom = b.y + 'px';
-            if(b.y > 400) { b.el.remove(); sBullets.splice(i, 1); }
-        }
-
-        for(let i = sEnemies.length - 1; i >= 0; i--) {
-            let e = sEnemies[i];
-            e.y += 0.5;
-            e.el.style.top = e.y + 'px';
-            
-            if(e.y > 400) {
-                e.el.remove();
-                if(e.data.isDoc) sMissedCount++; 
-                sEnemies.splice(i, 1);
-            }
-        }
-
-        for(let i = sEnemies.length - 1; i >= 0; i--) {
-            let e = sEnemies[i];
-            let eRect = e.el.getBoundingClientRect();
-            let hit = false;
-            for(let j = sBullets.length - 1; j >= 0; j--) {
-                let b = sBullets[j];
-                let bRect = b.el.getBoundingClientRect();
-                if (bRect.left < eRect.right && bRect.right > eRect.left && bRect.top < eRect.bottom && bRect.bottom > eRect.top) {
-                    handleShooterHit(e.data);
-                    e.el.remove(); b.el.remove();
-                    sEnemies.splice(i, 1); sBullets.splice(j, 1);
-                    hit = true; break;
+        // 綁定按鈕並加入 preventDefault() 嚴格阻擋手機 Safari/Chrome 的雙擊放大行為
+        const bindButton = (el, key, isJump) => {
+            el.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // 阻擋預設雙擊放大與選取
+                if(isJump) {
+                    if(mState.isGrounded) { mState.vy = mState.jumpPower; mState.isGrounded = false; playSound('jump'); }
+                } else {
+                    press(key);
                 }
+            }, {passive: false});
+
+            el.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                if(!isJump) release(key);
+            }, {passive: false});
+
+            el.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                if(!isJump) release(key);
+            }, {passive: false});
+
+            // 保留給電腦滑鼠點擊用
+            el.onmousedown = (e) => {
+                if(isJump) {
+                    if(mState.isGrounded) { mState.vy = mState.jumpPower; mState.isGrounded = false; playSound('jump'); }
+                } else {
+                    press(key);
+                }
+            };
+            el.onmouseup = () => { if(!isJump) release(key); };
+            el.onmouseleave = () => { if(!isJump) release(key); };
+        };
+
+        bindButton(btnL, 'left', false);
+        bindButton(btnR, 'right', false);
+        bindButton(btnJ, 'jump', true);
+    }
+
+    function handleKeyDown(e) {
+        if(e.key === 'ArrowLeft') keys.left = true;
+        if(e.key === 'ArrowRight') keys.right = true;
+        if(e.key === 'ArrowUp' || e.key === ' ') {
+            if(mState.isGrounded) { mState.vy = mState.jumpPower; mState.isGrounded = false; playSound('jump'); }
+        }
+    }
+    function handleKeyUp(e) {
+        if(e.key === 'ArrowLeft') keys.left = false;
+        if(e.key === 'ArrowRight') keys.right = false;
+    }
+
+    function physicsLoop(timestamp) {
+        if(!isGameRunning) return;
+        requestAnimationFrame(physicsLoop);
+
+        if (keys.left) { mState.vx = -mState.speed; document.getElementById('mario').classList.add('flip'); document.getElementById('mario').innerText = '🐕';}
+        else if (keys.right) { mState.vx = mState.speed; document.getElementById('mario').classList.remove('flip'); document.getElementById('mario').innerText = '🐕';}
+        else { mState.vx = 0; document.getElementById('mario').innerText = mState.isGrounded ? '🐶' : '🐩'; }
+
+        mState.x += mState.vx;
+        
+        if (mState.x < 0) mState.x = 0;
+        if (mState.x > gameWidth - mState.width) mState.x = gameWidth - mState.width;
+
+        mState.vy += mState.gravity;
+        mState.y += mState.vy;
+
+        if (mState.y >= 0) {
+            mState.y = 0; mState.vy = 0; mState.isGrounded = true;
+        } else {
+            mState.isGrounded = false; document.getElementById('mario').innerText = '🐩';
+        }
+
+        if (mState.vy < 0 && !hasAnswered) {
+            checkBrickCollision();
+        }
+
+        updateMarioDOM();
+    }
+
+    function updateMarioDOM() {
+        const m = document.getElementById('mario');
+        m.style.left = mState.x + 'px';
+        m.style.bottom = (60 + Math.abs(mState.y)) + 'px';
+    }
+
+    function checkBrickCollision() {
+        const marioRect = document.getElementById('mario').getBoundingClientRect();
+        const bricks = document.querySelectorAll('.brick');
+        
+        bricks.forEach(brick => {
+            const brickRect = brick.getBoundingClientRect();
+            if (marioRect.top <= brickRect.bottom && 
+                marioRect.top >= brickRect.top &&
+                marioRect.right > brickRect.left + 10 && 
+                marioRect.left < brickRect.right - 10) 
+            {
+                mState.vy = 2; // 反彈
+                triggerAnswer(brick);
             }
-            if(hit && !isShooterRunning) break; 
-        }
-
-        if(sEnemyPool.length === 0 && sEnemies.length === 0 && isShooterRunning) {
-            endLevel2();
-            return;
-        }
-
-        if(isShooterRunning) {
-            sGameLoopId = requestAnimationFrame(shooterLoop);
-        }
-    }
-
-    function spawnEnemy(data) {
-        let el = document.createElement('div');
-        el.className = 'enemy'; el.innerText = data.name;
-        
-        let bx;
-        let attempts = 0;
-        do {
-            bx = 5 + Math.random() * 80; 
-            attempts++;
-        } while (Math.abs(bx - lastSpawnX) < 20 && attempts < 10);
-        lastSpawnX = bx;
-
-        el.style.left = bx + '%';
-        el.style.top = '-30px';
-        shooterCanvas.appendChild(el);
-        sEnemies.push({ el: el, data: data, y: -30 });
-    }
-
-    function handleShooterHit(data) {
-        isShooterRunning = false;
-        cancelAnimationFrame(sGameLoopId);
-        
-        sKeys.left = false; sKeys.right = false; updateMoveDir();
-
-        const modal = document.getElementById('shooter-modal');
-        const mTitle = document.getElementById('sm-title');
-        const mDesc = document.getElementById('sm-desc');
-
-        if(data.isDoc) {
-            playSound('hit_correct'); // 加入命中音效
-            updateScore(2);
-            sCaughtCount++;
-            modal.style.borderColor = "var(--neon-green)";
-            mTitle.style.color = "var(--neon-green)";
-            mTitle.innerHTML = `🏅 獲得獎牌！(+2)<br><br>擊落【${data.name}】`;
-            mDesc.style.color = "#fff";
-            mDesc.innerHTML = `<span style="color:var(--neon-blue);">寫作目的：</span><br>${data.desc}`;
-            document.getElementById('l2-feedback').innerText = `已擊落目標：${sCaughtCount} / ${L2_TOTAL_TARGETS}`;
-        } else {
-            playSound('error'); // 加入錯誤警告音效
-            updateScore(-1);
-            modal.style.borderColor = "var(--neon-pink)";
-            mTitle.style.color = "var(--neon-pink)";
-            mTitle.innerHTML = `❌ 誤擊警告！(-1)<br><br>【${data.name}】不是禮儀文書！`;
-            mDesc.style.color = "#ccc";
-            mDesc.innerHTML = `<span style="color:var(--neon-pink);">實際用途：</span><br>${data.desc}`;
-        }
-        modal.style.display = "block";
-    }
-
-    function resumeShooter() {
-        playSound('click');
-        document.getElementById('shooter-modal').style.display = "none";
-        
-        if(sCaughtCount >= L2_TOTAL_TARGETS) { 
-            document.getElementById('l2-feedback').style.color = "var(--neon-green)";
-            document.getElementById('l2-feedback').innerText = ">> STAGE CLEARED: 完美擊落所有目標！";
-            document.removeEventListener('keydown', handleShooterKeyDown);
-            document.removeEventListener('keyup', handleShooterKeyUp);
-            setTimeout(() => { initLevel3Tank(); }, 1500);
-            return;
-        }
-
-        if(sEnemyPool.length === 0 && sEnemies.length === 0) {
-            endLevel2();
-            return;
-        }
-
-        isShooterRunning = true;
-        sGameLoopId = requestAnimationFrame(shooterLoop);
-    }
-
-    function endLevel2() {
-        isShooterRunning = false;
-        document.removeEventListener('keydown', handleShooterKeyDown);
-        document.removeEventListener('keyup', handleShooterKeyUp);
-        
-        const rModal = document.getElementById('shooter-result-modal');
-        const rDesc = document.getElementById('sr-desc');
-        
-        if(sCaughtCount >= L2_TOTAL_TARGETS) {
-            initLevel3Tank();
-        } else {
-            playSound('error');
-            rDesc.innerHTML = `戰報統整：<br><br>成功擊落：<strong style="color:var(--neon-green);">${sCaughtCount}</strong> 份<br>漏網之魚：<strong style="color:var(--neon-pink);">${sMissedCount}</strong> 份<br><br>長官，您未能回收所有禮儀文書！`;
-            rModal.style.display = "block";
-        }
-    }
-
-    function retryLevel2() {
-        playSound('click');
-        document.getElementById('shooter-result-modal').style.display = "none";
-        initLevel2Shooter();
-    }
-    function proceedToLevel3() {
-        playSound('click');
-        document.getElementById('shooter-result-modal').style.display = "none";
-        initLevel3Tank();
-    }
-
-    /* ================= 第三關：坦克大戰 ================= */
-    const l3DistractorPool = [
-        { name: "投訴信", desc: "表達強烈不滿" }, { name: "會議紀錄", desc: "客觀如實記錄會議過程" },
-        { name: "尋人啟事", desc: "尋找失蹤人士" }, { name: "新聞報道", desc: "客觀傳達最新發生事實" },
-        { name: "工作計劃", desc: "部署未來工作目標與步驟" }, { name: "通告", desc: "佈達資訊，無客套寒暄" },
-        { name: "通知", desc: "傳達上級指示或告知事項" }, { name: "廣告", desc: "宣傳商品或服務" },
-        { name: "合同", desc: "具法律效力的協議" }, { name: "守則", desc: "規定行為準則" },
-        { name: "商品說明書", desc: "客觀介紹商品特點與操作" }, { name: "建議書", desc: "提出建設性意見" }
-    ];
-
-    const l3StagesData = [
-        { name: "邀請類", targets: [
-            { name:"邀請信", desc:"希望受文者能答應請求出席活動，語氣誠懇有禮。" },
-            { name:"請柬", desc:"隆重的慶典才發，款式精美、莊重。" }
-        ], bg: "bg-stage1" },
-        { name: "迎送類", targets: [
-            { name:"歡迎辭", desc:"表達對賓客到來的熱烈歡迎與尊重。" },
-            { name:"歡送辭", desc:"對即將離去的人員表達歡送與祝福。" },
-            { name:"答謝辭", desc:"受招待或受獎後表達感謝。" }
-        ], bg: "bg-stage2" },
-        { name: "慰唁類", targets: [
-            { name:"慰問信", desc:"表示同情、安慰，並給予鼓勵。" },
-            { name:"悼辭", desc:"對死者表示哀悼與追思。" },
-            { name:"訃告", desc:"向親友及社會公眾發佈死訊。" }
-        ], bg: "bg-stage3" },
-        { name: "喜慶類", targets: [
-            { name:"賀卡", desc:"特定日子或節日送上的祝福。" },
-            { name:"賀電", desc:"通過電報發送的祝賀。" },
-            { name:"祝酒辭", desc:"酒會或宴會上發表的祝賀言辭。" },
-            { name:"題辭", desc:"題寫的紀念或勉勵語。" }
-        ], bg: "bg-stage4" },
-        { name: "公關類", targets: [
-            { name:"道歉信", desc:"承認錯誤，表達誠懇的歉意。" },
-            { name:"感謝信", desc:"以表達謝意為目的。" },
-            { name:"鳴謝啟事", desc:"通過媒體等公開表達感謝。" },
-            { name:"推薦信", desc:"向別人推薦優秀人才。" }
-        ], bg: "bg-stage5" }
-    ];
-
-    const mapWallLayouts = [
-        [ {x:15, y:15, w:8, h:40}, {x:77, y:15, w:8, h:40}, {x:35, y:25, w:30, h:10}, {x:40, y:70, w:6, h:15}, {x:54, y:70, w:6, h:15}, {x:40, y:60, w:20, h:10} ], 
-        [ {x:10, y:15, w:25, h:8}, {x:65, y:15, w:25, h:8}, {x:10, y:45, w:8, h:25}, {x:82, y:45, w:8, h:25}, {x:35, y:45, w:30, h:8}, {x:46, y:23, w:8, h:22} ],
-        [ {x:20, y:10, w:8, h:35}, {x:72, y:10, w:8, h:35}, {x:0, y:55, w:30, h:8}, {x:70, y:55, w:30, h:8}, {x:35, y:30, w:30, h:8}, {x:46, y:65, w:8, h:20} ],
-        [ {x:15, y:15, w:15, h:15}, {x:70, y:15, w:15, h:15}, {x:42, y:35, w:16, h:16}, {x:15, y:60, w:15, h:15}, {x:70, y:60, w:15, h:15} ], 
-        [ {x:0, y:20, w:35, h:8}, {x:65, y:20, w:35, h:8}, {x:20, y:45, w:60, h:8}, {x:20, y:70, w:25, h:8}, {x:65, y:70, w:25, h:8}, {x:46, y:53, w:8, h:17} ] 
-    ];
-
-    let tStageIndex = 0;
-    let tankCanvas, playerTank;
-    let tPosX = 48, tPosY = 85; 
-    let tSpeed = 0.8; 
-    
-    let tKeys = { up: false, down: false, left: false, right: false };
-    let tMoveDir = { x:0, y:0 };
-    
-    let tBlocks = [];
-    let tWallElements = [];
-    let isTankRunning = false;
-    let tGameLoopId;
-    let currentInteractingBlock = null;
-
-    function initLevel3Tank() {
-        switchScreen('screen-level3');
-        tankCanvas = document.getElementById('tank-container');
-        playerTank = document.getElementById('player-tank');
-        tStageIndex = 0;
-        
-        tKeys = { up: false, down: false, left: false, right: false };
-        tMoveDir = { x:0, y:0 };
-
-        document.addEventListener('keydown', handleTankKeyDown);
-        document.addEventListener('keyup', handleTankKeyUp);
-        
-        loadTankStage();
-    }
-
-    function buildWalls(stageIdx) {
-        tWallElements.forEach(w => w.remove());
-        tWallElements = [];
-        
-        let layout = mapWallLayouts[stageIdx % mapWallLayouts.length];
-        layout.forEach(wData => {
-            let wall = document.createElement('div');
-            wall.className = 'wall-block';
-            wall.style.left = wData.x + '%';
-            wall.style.top = wData.y + '%';
-            wall.style.width = wData.w + '%';
-            wall.style.height = wData.h + '%';
-            tankCanvas.appendChild(wall);
-            tWallElements.push(wall);
         });
     }
 
-    function loadTankStage() {
-        if(tStageIndex >= l3StagesData.length) {
-            isTankRunning = false;
-            document.getElementById('final-score').innerText = score;
-            switchScreen('screen-win');
-            playSound('hit_correct'); // 通關音效
-            return;
-        }
+    function triggerAnswer(brickEl) {
+        if(hasAnswered) return;
+        hasAnswered = true;
+        keys.left = false; keys.right = false;
 
-        const stageData = l3StagesData[tStageIndex];
-        document.getElementById('l3-stage-name').innerText = stageData.name;
+        playSound('hit');
+        brickEl.classList.add('hit');
         
-        tankCanvas.className = '';
-        tankCanvas.classList.add(stageData.bg);
-
-        tBlocks.forEach(b => b.el.remove());
-        tBlocks = [];
+        const idx = parseInt(brickEl.dataset.index);
+        const qData = db[currentDataKey].quiz[quizIndex];
+        const isCorrect = (idx === qData.ans);
+        const rationale = qData.rationales[idx];
         
-        buildWalls(tStageIndex);
+        const popup = brickEl.querySelector('.item-popup');
+        popup.classList.add('show');
 
-        let shuffledDistractors = [...l3DistractorPool].sort(() => Math.random() - 0.5).slice(0, 2);
-        let mapItems = [];
-        stageData.targets.forEach(t => mapItems.push({ data: t, isDoc: true }));
-        shuffledDistractors.forEach(d => mapItems.push({ data: d, isDoc: false }));
-        mapItems.sort(() => Math.random() - 0.5);
-
-        let currentLayout = mapWallLayouts[tStageIndex % mapWallLayouts.length];
-        
-        mapItems.forEach((item) => {
-            let el = document.createElement('div');
-            el.className = 'doc-block';
-            el.innerText = item.data.name;
-            
-            let bx, by;
-            let overlap = false;
-            let attempts = 0;
-            
-            do {
-                overlap = false;
-                bx = 5 + Math.random() * 70; 
-                by = 5 + Math.random() * 65; 
-
-                for(let w of currentLayout) {
-                    if (bx < w.x + w.w && bx + 16 > w.x &&
-                        by < w.y + w.h && by + 12 > w.y) {
-                        overlap = true;
-                        break;
-                    }
-                }
-                
-                if (bx > 35 && bx < 65 && by > 70) overlap = true;
-                
-                if (!overlap) {
-                    for(let block of tBlocks) {
-                        if (bx < block.bx + 18 && bx + 18 > block.bx &&
-                            by < block.by + 14 && by + 14 > block.by) {
-                            overlap = true;
-                            break;
-                        }
-                    }
-                }
-                attempts++;
-            } while (overlap && attempts < 200);
-
-            el.style.left = bx + '%';
-            el.style.top = by + '%';
-            tankCanvas.appendChild(el);
-            
-            tBlocks.push({ el: el, item: item, active: true, bx: bx, by: by });
-        });
-
-        tPosX = 48; tPosY = 85;
-        updateTankPos();
-        playerTank.style.transform = 'rotate(0deg)';
-
-        isTankRunning = true;
-        tGameLoopId = requestAnimationFrame(tankLoop);
-    }
-
-    function handleTankKeyDown(e) {
-        if(!isTankRunning) return;
-        if(e.key === "ArrowUp") { tKeys.up = true; updateTankDir(); }
-        if(e.key === "ArrowDown") { tKeys.down = true; updateTankDir(); }
-        if(e.key === "ArrowLeft") { tKeys.left = true; updateTankDir(); }
-        if(e.key === "ArrowRight") { tKeys.right = true; updateTankDir(); }
-    }
-    function handleTankKeyUp(e) {
-        if(e.key === "ArrowUp") { tKeys.up = false; updateTankDir(); }
-        if(e.key === "ArrowDown") { tKeys.down = false; updateTankDir(); }
-        if(e.key === "ArrowLeft") { tKeys.left = false; updateTankDir(); }
-        if(e.key === "ArrowRight") { tKeys.right = false; updateTankDir(); }
-    }
-    
-    function moveTankDir(dir) {
-        if(dir === 'up') { tKeys.up = true; updateTankDir(); }
-        if(dir === 'down') { tKeys.down = true; updateTankDir(); }
-        if(dir === 'left') { tKeys.left = true; updateTankDir(); }
-        if(dir === 'right') { tKeys.right = true; updateTankDir(); }
-    }
-    function stopTank() { 
-        tKeys = { up: false, down: false, left: false, right: false };
-        updateTankDir(); 
-    }
-
-    function updateTankDir() {
-        tMoveDir.x = 0; tMoveDir.y = 0;
-        if(tKeys.up) { tMoveDir.y = -1; playerTank.style.transform = 'rotate(0deg)'; }
-        if(tKeys.down) { tMoveDir.y = 1; playerTank.style.transform = 'rotate(180deg)'; }
-        if(tKeys.left) { tMoveDir.x = -1; playerTank.style.transform = 'rotate(-90deg)'; }
-        if(tKeys.right) { tMoveDir.x = 1; playerTank.style.transform = 'rotate(90deg)'; }
-    }
-
-    function updateTankPos() {
-        playerTank.style.left = tPosX + '%';
-        playerTank.style.top = tPosY + '%';
-    }
-
-    function tankLoop() {
-        if(!isTankRunning) return;
-
-        if(tMoveDir.x !== 0 || tMoveDir.y !== 0) {
-            let nextX = tPosX + tMoveDir.x * tSpeed;
-            let nextY = tPosY + tMoveDir.y * tSpeed;
-            
-            if(nextX < 2) nextX = 2; if(nextX > 93) nextX = 93;
-            if(nextY < 2) nextY = 2; if(nextY > 90) nextY = 90;
-            
-            playerTank.style.left = nextX + '%';
-            playerTank.style.top = nextY + '%';
-            let tankRect = playerTank.getBoundingClientRect();
-            
-            let hitWall = false;
-            let margin = 3; 
-            
-            for(let w of tWallElements) {
-                let wRect = w.getBoundingClientRect();
-                if (tankRect.left + margin < wRect.right && tankRect.right - margin > wRect.left &&
-                    tankRect.top + margin < wRect.bottom && tankRect.bottom - margin > wRect.top) {
-                    hitWall = true;
-                    break;
-                }
-            }
-
-            if (hitWall) {
-                playerTank.style.left = tPosX + '%';
-                playerTank.style.top = tPosY + '%';
+        setTimeout(() => {
+            if (isCorrect) {
+                playSound('correct'); currentScore += 2; updateScoreDisplay();
+                showGameMsg("✅ 答對喇！", "獲得變大蘑菇！⭐ 分數 +2", rationale, "#27ae60");
             } else {
-                tPosX = nextX;
-                tPosY = nextY;
-                
-                for(let i=0; i<tBlocks.length; i++) {
-                    let block = tBlocks[i];
-                    if(!block.active) continue;
-                    let bRect = block.el.getBoundingClientRect();
-
-                    if (tankRect.left < bRect.right - 5 && tankRect.right > bRect.left + 5 &&
-                        tankRect.top < bRect.bottom - 5 && tankRect.bottom > bRect.top + 5) {
-                        triggerBlockAction(block);
-                        break;
-                    }
-                }
+                playSound('wrong'); currentScore -= 1; updateScoreDisplay();
+                showGameMsg("❌ 哎呀！", "頂錯磚頭，被毒花咬到了！💔 分數 -1", rationale, "#e74c3c");
             }
-        }
-
-        if(isTankRunning) {
-            tGameLoopId = requestAnimationFrame(tankLoop);
-        }
+        }, 800);
     }
 
-    function triggerBlockAction(block) {
-        playSound('click'); // 撞擊區塊時的提示音
-        isTankRunning = false;
-        cancelAnimationFrame(tGameLoopId);
-        tKeys = { up: false, down: false, left: false, right: false };
-        updateTankDir();
+    function showGameMsg(title, reward, analysis, color) {
+        document.getElementById('msg-title').innerText = title;
+        document.getElementById('msg-title').style.color = color;
+        document.getElementById('msg-reward').innerText = reward;
+        document.getElementById('msg-reward').style.color = color;
         
-        currentInteractingBlock = block;
-        document.getElementById('tm-doc-name').innerText = block.item.data.name;
-        document.getElementById('tank-action-modal').style.display = 'block';
-    }
-
-    function executeTankAction(action) {
-        document.getElementById('tank-action-modal').style.display = 'none';
-        
-        let block = currentInteractingBlock;
-        let isDoc = block.item.isDoc;
-        
-        const rModal = document.getElementById('tank-result-modal');
-        const rTitle = document.getElementById('trm-title');
-        const rDesc = document.getElementById('trm-desc');
-
-        if(action === 'friendly') {
-            if(isDoc) {
-                playSound('rescue'); // 播放營救成功的歡樂音效
-                updateScore(2);
-                rModal.style.borderColor = "var(--neon-green)";
-                rTitle.style.color = "var(--neon-green)";
-                rTitle.innerHTML = `🏅 成功營救友軍！(+2)<br>【${block.item.data.name}】`;
-                rDesc.innerHTML = `<span style="color:var(--neon-blue);">寫作目的：</span><br>${block.item.data.desc}`;
-                block.el.className = 'doc-block type-target'; 
-            } else {
-                playSound('error'); // 錯誤音效
-                updateScore(-1);
-                rModal.style.borderColor = "var(--neon-pink)";
-                rTitle.style.color = "var(--neon-pink)";
-                rTitle.innerHTML = `❌ 錯誤識別！(-1)<br>【${block.item.data.name}】是干擾項！`;
-                rDesc.innerHTML = `這不是【${l3StagesData[tStageIndex].name}】的文書，我們被騙了！`;
-            }
-        } 
-        else if (action === 'fire') {
-            if(!isDoc) {
-                playExplosion(); // 播放爆炸音效
-                updateScore(2);
-                rModal.style.borderColor = "var(--neon-yellow)";
-                rTitle.style.color = "var(--neon-yellow)";
-                rTitle.innerHTML = `💥 成功摧毀干擾項！(+2)<br>【${block.item.data.name}】`;
-                rDesc.innerHTML = `<span style="color:var(--neon-pink);">非本關文書用途：</span><br>${block.item.data.desc}`;
-                block.el.classList.add('exploded'); 
-            } else {
-                playSound('error'); // 錯誤音效
-                updateScore(-1);
-                rModal.style.borderColor = "var(--neon-pink)";
-                rTitle.style.color = "var(--neon-pink)";
-                rTitle.innerHTML = `❌ 誤擊友軍！(-1)<br>【${block.item.data.name}】是營救目標！`;
-                rDesc.innerHTML = `這屬於【${l3StagesData[tStageIndex].name}】，指揮部對你的開火感到失望！`;
-            }
-        }
-
-        rModal.style.display = 'block';
-        
-        setTimeout(() => { block.el.style.display = 'none'; }, 300);
-        block.active = false;
-    }
-
-    function resumeTank() {
-        playSound('click');
-        document.getElementById('tank-result-modal').style.display = 'none';
-        
-        let hasActive = tBlocks.some(b => b.active);
-        
-        if(!hasActive) {
-            tStageIndex++;
-            setTimeout(loadTankStage, 500);
+        const analysisEl = document.getElementById('msg-analysis');
+        if (analysis) {
+            analysisEl.style.display = 'block';
+            analysisEl.innerHTML = `<strong>💡 錯誤/選項分析：</strong><br>${analysis}`;
         } else {
-            tPosX -= (tMoveDir.x * 6);
-            tPosY -= (tMoveDir.y * 6);
-            updateTankPos();
+            analysisEl.style.display = 'none';
+        }
+        
+        const msgBox = document.getElementById('game-msg');
+        msgBox.style.display = 'block';
+        msgBox.scrollTo(0,0);
+    }
+
+    function nextQuizQuestion() {
+        document.getElementById('game-msg').style.display = 'none';
+        
+        const hitBrick = document.querySelector('.brick.hit');
+        if (hitBrick && hitBrick.dataset.correct === 'true') {
+            quizIndex++;
+        }
+        
+        if (quizIndex < db[currentDataKey].quiz.length) {
+            loadQuizQuestion();
+        } else {
+            playSound('win');
+            showGameMsg("🎉 挑戰成功！", `你已完全掌握這份禮儀文書！\n🍄 你的總分是：${currentScore} 分`, null, "#f1c40f");
             
-            isTankRunning = true;
-            tGameLoopId = requestAnimationFrame(tankLoop);
+            const btn = document.querySelector('#game-msg button');
+            btn.innerText = "完成";
+            btn.onclick = () => {
+                document.getElementById('game-msg').style.display = 'none';
+                btn.innerText = "繼續";
+                btn.onclick = nextQuizQuestion; 
+                exitGame();
+            };
         }
     }
+
+    updateGameDimensions();
+
 </script>
-
 </body>
 </html>
